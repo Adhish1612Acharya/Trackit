@@ -1,5 +1,4 @@
 import { auth, db } from "@/firebaseconfig";
-import { RootState } from "@/store/store";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -25,7 +24,6 @@ export const checkLogin = createAsyncThunk(
           thunkAPI.dispatch(setIsOwner(false));
           toast.error("Access Denied");
         } else {
-          const user = querySnap.data();
 
           thunkAPI.dispatch(setLoggedIn(true));
         }

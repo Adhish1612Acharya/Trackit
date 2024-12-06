@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { FC, forwardRef } from "react";
+import { FC } from "react";
 import addExpenseFormSchema from "@/validations/forms/AddExpenseForm";
 import SelectInput from "./SelectInput";
 import CalenderBtn from "./CalenderBtn";
@@ -19,7 +19,6 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState, useAppSelector } from "@/store/store";
 import {
   addDailyExpense,
-  formValueType,
   projectOptionsType,
   setMiscellaneousInput,
   setOpenAddExpenseDrawer,

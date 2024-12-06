@@ -1,4 +1,4 @@
-import React, { forwardRef, FC } from "react";
+import  { forwardRef } from "react";
 import {
   Select,
   SelectContent,
@@ -24,7 +24,6 @@ type selectInputProps = {
   field: ControllerRenderProps<any, string>;
   form: UseFormReturn<any>;
   setMiscelleneousInput?: (value: boolean) => void;
-  submit?: boolean;
   filterSelect?: boolean;
 };
 
@@ -38,7 +37,6 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
       setMiscelleneousInput,
       form,
       filterSelect,
-      submit,
     } = props;
 
     return (

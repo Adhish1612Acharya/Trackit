@@ -9,7 +9,6 @@ import LoginForm from "@/components/Home/LoginForm";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useLogin } from "@/Context/LoginProviderContext";
 import { auth } from "@/firebaseconfig";
-import { toast } from "react-toastify";
 
 const backgroundImageUrl =
   "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -68,7 +67,7 @@ const StyledButton = styled(Button)({
 });
 
 const Home = () => {
-  const { isLoggedIn, setIsLoggedIn } = useLogin();
+  const {  setIsLoggedIn } = useLogin();
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

@@ -2,11 +2,8 @@ import { useParams } from "react-router-dom";
 // DailyExpense.js
 import { useEffect } from "react";
 import DataTable from "@/components/DataTable/DataTable";
-import { Fab, Container } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Container } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/store/store";
-import { setOpenAddExpenseDrawer } from "@/store/features/DailyExpense";
-import AddExpenseDrawer from "@/components/AddExpenseDrawer/AddExpenseDrawer";
 import FilterDrawer from "@/components/FilterDrawer";
 import { getUserProjectExpense } from "@/store/features/ProjectDetails";
 

@@ -13,8 +13,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import formSchema from "@/validations/Home/LoginForm";
 import { FC } from "react";
-import { Typography } from "@mui/material";
-import { Link } from "react-router-dom";
 import { valueObj } from "@/store/features/Home/Home";
 
 type props = {

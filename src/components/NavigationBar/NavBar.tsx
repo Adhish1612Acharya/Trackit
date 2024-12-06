@@ -33,6 +33,8 @@ function NavBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
+
+  console.log(anchorElNav);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
   );

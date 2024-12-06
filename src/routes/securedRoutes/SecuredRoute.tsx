@@ -1,19 +1,14 @@
-import React, { useEffect } from "react";
-import { auth } from "@/firebaseconfig";
-import { useSelector } from "react-redux";
+import  { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/store";
-import { Navigate, Outlet, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { Navigate, Outlet } from "react-router-dom";
 import { checkLogin } from "@/store/features/securedRoutes/SecureRoute";
 import { useLogin } from "@/Context/LoginProviderContext";
 import { CircularProgress } from "@mui/material";
 
 const SecuredRoute = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { setIsLoggedIn } = useLogin();
   const loggedIn = useAppSelector((state) => state.securedRoute.loggedIn);
-  const roleIsOwner = useAppSelector((state) => state.securedRoute.roleIsOwner);
 
   useEffect(() => {
     dispatch(checkLogin());

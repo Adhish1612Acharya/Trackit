@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 const Projects = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const loading = useAppSelector((state) => state.getProjectDetails.loading);
   const projects = useAppSelector((state) => state.getProjectDetails.projects);
 
   useEffect(() => {

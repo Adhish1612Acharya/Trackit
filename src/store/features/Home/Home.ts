@@ -6,8 +6,6 @@ import {
 } from "firebase/auth";
 import { toast } from "react-toastify";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { RootState } from "@/store/store";
-import { Action } from "@radix-ui/react-alert-dialog";
 
 interface initialStateType {
   loginLoad: boolean;
@@ -45,14 +43,13 @@ const initialState: initialStateType = {
 
 export const signUp = createAsyncThunk(
   "/signUp",
-  async ({ value }: payLoad2, thunkAPI) => {
+  async ({ value }: payLoad2, _thunkAPI) => {
     await createUserWithEmailAndPassword(
       auth,
       value.email,
       value.password
     ).then(async (userCredential) => {
       const user = userCredential.user;
-      const state = thunkAPI.getState() as RootState;
       const docRef = doc(db, "users", user.uid);
 
       await setDoc(docRef, {
@@ -75,16 +72,15 @@ export const signUp = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "/login",
-  async ({ value }: payLoad, thunkAPI) => {
+  async ({ value }: payLoad, _thunkAPI) => {
     const resp = await signInWithEmailAndPassword(
       auth,
       value.email,
       value.password
     );
     const user = auth.currentUser;
-    const state = thunkAPI.getState() as RootState;
     const docRef = doc(db, "users", `${user?.uid}`);
-    const docSnap = await getDoc(docRef);
+     await getDoc(docRef);
     return {
       uid: resp.user.uid,
       email: resp.user.email,
@@ -94,7 +90,7 @@ export const login = createAsyncThunk(
 
 export const googleLogin = createAsyncThunk(
   "/auth/google",
-  async (_value, thunkAPI) => {
+  async (_value, _thunkAPI) => {
     try {
       await signInWithGooglePopPup().then(async (data) => {
         const docRef = doc(db, "users", `${data.user.uid}`);
@@ -118,7 +114,7 @@ export const googleLogin = createAsyncThunk(
     } catch (err) {
       console.log("Error : ", err);
     }
-    const state = thunkAPI.getState() as RootState;
+   
   }
 );
 
@@ -137,7 +133,7 @@ export const LoginSlice = createSlice({
       state.loginLoad = true;
     });
 
-    builder.addCase(login.fulfilled, (state, action) => {
+    builder.addCase(login.fulfilled, (state, _action) => {
       state.loginLoad = false;
       state.loggedIn = true;
       toast.success("Success Login");

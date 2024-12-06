@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { FC } from "react";
+import { FC } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -11,16 +11,15 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import SelectInput from "./AddExpenseDrawer/SelectInput";
-import constructionRoles, {
+import  {
   constructionRolesFilterSearch,
 } from "@/filterData/contructionRolesData";
-import paymentTypes, {
+import {
   paymentTypesFilterSearch,
 } from "@/filterData/paymentFilters";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState, useAppSelector } from "@/store/store";
-import { applyFilter, projectOptionsType } from "@/store/features/DailyExpense";
-import filterSearchScheme, {
+import  {
   projectExpenseFilterSearchScheme,
 } from "@/validations/forms/FilterSearchForm";
 import { Button } from "./ui/button";

@@ -5,9 +5,13 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      // "@/*": ["./src/*"]
+      "include": ["src/*"],
+      "exclude": ["node_modules", "dist"]
     }
   }
 }
