@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/popover";
 import { FormControl } from "../ui/form";
 import { Button } from "../ui/button";
+import "../../style/global.css";
 
 type CalenderBtnProps = {
   field: any;
@@ -38,6 +39,7 @@ const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
+          className="calendar bg-white text-black border-gray-300"
           mode="single"
           selected={field.value}
           onSelect={field.onChange}

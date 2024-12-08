@@ -1,0 +1,5 @@
+.calendar {
+  background-color: #ffffff !important; /* Always white */
+  color: #000000 !important; /* Always black text */
+  border-color: #d1d5db !important; /* Tailwind's gray-300 */
+}

@@ -27,6 +27,7 @@ import {
 import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
 import { ChevronRight, Loader2 } from "lucide-react";
+import { Box } from "@mui/material";
 
 interface addExpenseFormProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
@@ -131,6 +132,47 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
             )}
           />
 
+          {/* Miscellaneous Fields */}
+          {useAppSelector(
+            (state) => state.addDailyExpense.miscellaneousInput
+          ) && (
+            <Box
+              sx={{
+                display: { xs: "flex", sm: "flex", md: "none" },
+                gap: "1rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <FormField
+                control={form.control}
+                name="miscellaneousPaidToName"
+                render={({ field }) => (
+                  <FormItem style={{ flex: 1, marginLeft: "1rem" }}>
+                    <FormLabel>Miscellaneous Paid To Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="miscellaneousPaidToRole"
+                render={({ field }) => (
+                  <FormItem style={{ flex: 1, marginRight: "1rem" }}>
+                    <FormLabel>Miscellaneous Paid To Role</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter the role" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </Box>
+          )}
+
           {/* Row for Paid To and Payment Mode */}
           <div
             style={{
@@ -191,13 +233,14 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
           {useAppSelector(
             (state) => state.addDailyExpense.miscellaneousInput
           ) && (
-            <div
-              style={{
-                display: "flex",
+            <Box
+              sx={{
+                display: { xs: "none", sm: "none", md: "flex" },
                 gap: "1rem",
                 flexWrap: "wrap",
               }}
             >
+              {" "}
               <FormField
                 control={form.control}
                 name="miscellaneousPaidToName"
@@ -211,7 +254,6 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="miscellaneousPaidToRole"
@@ -225,7 +267,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   </FormItem>
                 )}
               />
-            </div>
+            </Box>
           )}
 
           {/* Project Selector with Add Project Button */}
