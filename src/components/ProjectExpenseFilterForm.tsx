@@ -42,7 +42,7 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
   const onSubmit = (
     filterData: z.infer<typeof projectExpenseFilterSearchScheme>
   ) => {
-    let formattedDate: string = "";
+    // let formattedDate: string = "";
 
     // // Format the date into "DD-MM-YYYY"
     // if (filterData.date !== undefined) {
@@ -59,7 +59,7 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
     const data: {
       paidToId: string;
       paymentModeId: string;
-      date: string | undefined;
+      date: any;
     } = {
       paidToId: filterData.paidToId,
       paymentModeId: filterData.paymentModeId,
