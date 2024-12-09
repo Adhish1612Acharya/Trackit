@@ -37,7 +37,13 @@ const DataTable: FC<dataTableProps> = ({
   };
 
   return (
-    <Box sx={{ width: "100%", p: 2 }}>
+    <Box
+      sx={{
+        width: "100%",
+        p: 2,
+        marginTop: "4rem",
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -76,6 +82,34 @@ const DataTable: FC<dataTableProps> = ({
           Filter
         </Button>
       </Box>
+
+      {totalExpense >= 0 ? (
+        <Paper
+          elevation={3}
+          sx={{
+            mt: 2,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1rem",
+          }}
+        >
+          <Typography variant="h6">Total:</Typography>
+          <Typography variant="h6"> &#x20B9;{totalExpense}</Typography>
+        </Paper>
+      ) : (
+        <Skeleton
+          sx={{
+            mt: 2,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "90px",
+          }}
+        />
+      )}
 
       {/* PC View - Table */}
       <TableComponent expense={expense} projectExpense={projectExpense} />
@@ -122,32 +156,6 @@ const DataTable: FC<dataTableProps> = ({
         </Box>
       )}
 
-      {totalExpense > 0 ? (
-        <Paper
-          elevation={3}
-          sx={{
-            mt: 2,
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h6">Total:</Typography>
-          <Typography variant="h6"> &#x20B9;{totalExpense}</Typography>
-        </Paper>
-      ) : (
-        <Skeleton
-          sx={{
-            mt: 2,
-            p: 2,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            height: "90px",
-          }}
-        />
-      )}
       {/* Total displayed in Paper */}
     </Box>
   );

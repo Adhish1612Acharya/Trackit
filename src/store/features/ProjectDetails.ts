@@ -11,6 +11,7 @@ import {
   where,
 } from "firebase/firestore";
 import { toast } from "react-toastify";
+import { Action } from "@radix-ui/react-alert-dialog";
 
 interface initialStateType {
   expense: expenseType[];
@@ -20,11 +21,12 @@ interface initialStateType {
   addFilterBtnLoad: boolean;
   dataTableLoader: boolean;
   total: number;
+  projectName: string;
 }
 
 const initialState: initialStateType = {
   filterProjects: [],
-
+  projectName: "",
   pageLoading: true,
   expense: [],
   openFilterDrawer: false,
@@ -46,7 +48,7 @@ export const getUserProjectExpense = createAsyncThunk<
   {
     rejectValue: string;
   }
->("/getUserExpense", async (projectId: string, _thunkAPI) => {
+>("/getUserExpense", async (projectId: string, thunkAPI) => {
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -96,6 +98,13 @@ export const getUserProjectExpense = createAsyncThunk<
           // Get user document
           const userDocRef = doc(db, "users", user.uid);
           const userDocSnap = await getDoc(userDocRef);
+
+          const projectQuery = doc(db, "projects", projectId);
+          const queryResp = await getDoc(projectQuery);
+
+          const projectDetail = queryResp.data();
+
+          thunkAPI.dispatch(setProjectName(projectDetail?.title));
 
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
@@ -262,6 +271,9 @@ const getProjectDetailsSlice = createSlice({
     setProjectDetailsOpenFilterDrawer: (state, action) => {
       state.openFilterDrawer = action.payload;
     },
+    setProjectName: (state, action) => {
+      state.projectName = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserProjectExpense.pending, (state, _action) => {
@@ -306,5 +318,5 @@ const getProjectDetailsSlice = createSlice({
 });
 
 export default getProjectDetailsSlice.reducer;
-export const { setProjectDetailsOpenFilterDrawer } =
+export const { setProjectDetailsOpenFilterDrawer, setProjectName } =
   getProjectDetailsSlice.actions;

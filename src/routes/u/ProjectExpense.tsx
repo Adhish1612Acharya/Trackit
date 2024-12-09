@@ -24,11 +24,12 @@ const ProjectExpense = () => {
     (state) => state.getProjectExpense.filterProjects
   );
 
+  const projectTitle = useAppSelector(
+    (state) => state.getProjectExpense.projectName
+  );
+
   const total = useAppSelector((state) => state.getProjectExpense.total);
 
-  // const submit = useAppSelector(
-  //   (state) => state.addDailyExpense.submitAddDailyExpense
-  // );
 
   useEffect(() => {
     dispatch(getUserProjectExpense(id as string));
@@ -42,7 +43,7 @@ const ProjectExpense = () => {
         projectExpense={true}
         totalExpense={total}
         dailyExpense={false}
-        projectName={dailyExpense[0].projectTitle}
+        projectName={projectTitle}
       />
 
       <FilterDrawer
