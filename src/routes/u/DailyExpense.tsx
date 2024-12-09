@@ -36,13 +36,16 @@ const DailyExpense = () => {
     (state) => state.addDailyExpense.filterProjects
   );
 
+  const totalValue = useAppSelector(
+    (state) => state.addDailyExpense.totalValue
+  );
+
   // const submit = useAppSelector(
   //   (state) => state.addDailyExpense.submitAddDailyExpense
   // );
 
   useEffect(() => {
     dispatch(getUserDailyExpense());
- 
   }, [dispatch, setIsLoggedIn]);
 
   return (
@@ -51,6 +54,8 @@ const DailyExpense = () => {
         expense={dailyExpense}
         dispatch={dispatch}
         projectExpense={false}
+        totalExpense={totalValue}
+        dailyExpense={true}
       />
 
       {/* Floating Action Button */}

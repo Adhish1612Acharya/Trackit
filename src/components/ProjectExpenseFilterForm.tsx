@@ -11,17 +11,11 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import SelectInput from "./AddExpenseDrawer/SelectInput";
-import  {
-  constructionRolesFilterSearch,
-} from "@/filterData/contructionRolesData";
-import {
-  paymentTypesFilterSearch,
-} from "@/filterData/paymentFilters";
+import { constructionRolesFilterSearch } from "@/filterData/contructionRolesData";
+import { paymentTypesFilterSearch } from "@/filterData/paymentFilters";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState, useAppSelector } from "@/store/store";
-import  {
-  projectExpenseFilterSearchScheme,
-} from "@/validations/forms/FilterSearchForm";
+import { projectExpenseFilterSearchScheme } from "@/validations/forms/FilterSearchForm";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
 import CalenderBtn from "./AddExpenseDrawer/CalenderBtn";
@@ -50,26 +44,26 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
   ) => {
     let formattedDate: string = "";
 
-    // Format the date into "DD-MM-YYYY"
-    if (filterData.date !== undefined) {
-      formattedDate = (filterData.date as Date)
-        .toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-        })
-        .split("/")
-        .join("-");
-    }
+    // // Format the date into "DD-MM-YYYY"
+    // if (filterData.date !== undefined) {
+    //   formattedDate = (filterData.date as Date)
+    //     .toLocaleDateString("en-GB", {
+    //       day: "2-digit",
+    //       month: "2-digit",
+    //       year: "numeric",
+    //     })
+    //     .split("/")
+    //     .join("-");
+    // }
 
     const data: {
       paidToId: string;
       paymentModeId: string;
-      date: string;
+      date: string | undefined;
     } = {
       paidToId: filterData.paidToId,
       paymentModeId: filterData.paymentModeId,
-      date: formattedDate,
+      date: filterData.date,
     };
 
     dispatch(projectDetailsApplyFilter({ filterValue: data, projectId }));

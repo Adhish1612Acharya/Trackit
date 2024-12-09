@@ -7,9 +7,11 @@ import {
   getDoc,
   getDocs,
   query,
+  Timestamp,
   where,
 } from "firebase/firestore";
 import { toast } from "react-toastify";
+import { start } from "repl";
 
 interface initialStateType {
   expense: expenseType[];
@@ -18,6 +20,7 @@ interface initialStateType {
   filterProjects: projectOptionsType[];
   addFilterBtnLoad: boolean;
   dataTableLoader: boolean;
+  total: number;
 }
 
 const initialState: initialStateType = {
@@ -29,11 +32,13 @@ const initialState: initialStateType = {
 
   addFilterBtnLoad: false,
   dataTableLoader: false,
+  total: 0,
 };
 
 interface GetUserDailyExpenseResponse {
   userData: any; // Replace `any` with the proper type of your user data if known
   dailyExpense: formValueType[] | []; // Replace `any` with the correct type for expense data
+  total: number;
 }
 
 export const getUserProjectExpense = createAsyncThunk<
@@ -47,18 +52,6 @@ export const getUserProjectExpense = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          // Format the date into "DD-MM-YYYY"
-          //   const todayDate = new Date();
-
-          //   const formattedDate = todayDate
-          //     .toLocaleDateString("en-GB", {
-          //       day: "2-digit",
-          //       month: "2-digit",
-          //       year: "numeric",
-          //     })
-          //     .split("/")
-          //     .join("-");
-
           // Query for daily expenses
           const userExpenseQuery = query(
             collection(db, "expense"),
@@ -67,9 +60,39 @@ export const getUserProjectExpense = createAsyncThunk<
           );
           const querySnapShot = await getDocs(userExpenseQuery);
 
-          const dailyExpense = querySnapShot.docs.map(
-            (doc) => doc.data() as formValueType
-          );
+          const dailyExpense = querySnapShot.docs.map((doc) => {
+            const eachDoc = doc.data() as any;
+
+            const formattedDate = (
+              eachDoc.date instanceof Timestamp
+                ? eachDoc.date.toDate()
+                : (eachDoc.date as Date)
+            )
+              .toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+              .split("/")
+              .join("-");
+
+            eachDoc.date = formattedDate;
+
+            return eachDoc;
+          });
+
+          let total = 0;
+
+          console.log(dailyExpense);
+
+          if (dailyExpense.length > 0) {
+            total = dailyExpense.reduce(
+              (accu, eachExpense) => accu + Number(eachExpense.amount),
+              0
+            );
+          }
+
+          console.log(total);
 
           // Get user document
           const userDocRef = doc(db, "users", user.uid);
@@ -81,6 +104,7 @@ export const getUserProjectExpense = createAsyncThunk<
             resolve({
               userData,
               dailyExpense: dailyExpense,
+              total,
             });
           }
         } catch (error) {
@@ -97,6 +121,7 @@ export const getUserProjectExpense = createAsyncThunk<
 
 interface filterData {
   filteredExpense: expenseType[] | [];
+  total: number;
 }
 
 export interface filterValueType {
@@ -124,6 +149,21 @@ export const projectDetailsApplyFilter = createAsyncThunk<
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
+        let startTimestamp: Timestamp | string = "";
+        let endTimestamp: Timestamp | string = "";
+
+        const convertTimeStamp = (date: string) => {
+          // Format the date into "DD-MM-YYYY"
+          const todayStartDate = new Date(date);
+          todayStartDate.setHours(0, 0, 0, 0);
+
+          const todayEndDate = new Date(date);
+          todayEndDate.setHours(23, 59, 59, 999);
+
+          // Convert the Date objects to Firestore Timestamps
+          startTimestamp = Timestamp.fromDate(todayStartDate);
+          endTimestamp = Timestamp.fromDate(todayEndDate);
+        };
         try {
           const filterValue = value.filterValue;
           const formattedFilterData: any = {
@@ -133,17 +173,32 @@ export const projectDetailsApplyFilter = createAsyncThunk<
             ...(filterValue.paymentModeId !== "51" && {
               paymentModeId: filterValue.paymentModeId,
             }),
-            ...(filterValue.date !== "" && {
-              date: filterValue.date,
-            }),
           };
 
+          if (filterValue.date !== "" && filterValue.date !== undefined) {
+            convertTimeStamp(filterValue.date);
+          }
+
+          let projectQueryExpense: any;
+
+          if (filterValue.date !== "" && filterValue.date !== undefined) {
+            // Create the base query
+            projectQueryExpense = query(
+              collection(db, "expense"),
+              where("owner", "==", user.uid),
+              where("projectId", "==", value.projectId),
+              where("date", ">=", startTimestamp),
+              where("date", "<=", endTimestamp)
+            );
+          } else {
+            projectQueryExpense = query(
+              collection(db, "expense"),
+              where("owner", "==", user.uid),
+              where("projectId", "==", value.projectId)
+            );
+          }
+
           // Create the base query
-          let projectQueryExpense = query(
-            collection(db, "expense"),
-            where("owner", "==", user.uid),
-            where("projectId", "==", value.projectId)
-          );
 
           // Dynamically add filters from formattedFilterData
           Object.keys(formattedFilterData).forEach((key) => {
@@ -156,15 +211,39 @@ export const projectDetailsApplyFilter = createAsyncThunk<
           // Get the filtered documents
           const querySnapshot = await getDocs(projectQueryExpense);
 
+          let total = 0;
+
           // // Process the documents
           if (!querySnapshot.empty) {
             filteredExpense = querySnapshot.docs.map((doc) => {
-              return doc.data() as expenseType;
+              const eachDoc = doc.data() as any;
+
+              const formattedDate = (
+                eachDoc.date instanceof Timestamp
+                  ? eachDoc.date.toDate()
+                  : (eachDoc.date as Date)
+              )
+                .toLocaleDateString("en-GB", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+                .split("/")
+                .join("-");
+
+              eachDoc.date = formattedDate;
+
+              return eachDoc;
             });
+            total = filteredExpense.reduce(
+              (accum, eachExpense) => accum + Number(eachExpense.amount),
+              0
+            );
           }
 
           resolve({
             filteredExpense,
+            total,
           });
         } catch (err) {
           console.error("Error fetching user data:", err);
@@ -194,6 +273,7 @@ const getProjectDetailsSlice = createSlice({
     builder.addCase(getUserProjectExpense.fulfilled, (state, action) => {
       state.pageLoading = false;
       state.expense = action.payload.dailyExpense as expenseType[] | [];
+      state.total = action.payload.total;
       state.filterProjects = [...action.payload.userData.projects];
       state.filterProjects.push({ id: "-1", name: "All" });
       state.dataTableLoader = false;
@@ -213,6 +293,7 @@ const getProjectDetailsSlice = createSlice({
       state.expense = action.payload.filteredExpense;
       state.dataTableLoader = false;
       state.addFilterBtnLoad = false;
+      state.total = action.payload.total;
       state.openFilterDrawer = false;
     });
 

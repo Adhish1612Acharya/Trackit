@@ -1,12 +1,7 @@
 // DataTable.js
 import { FC, useState } from "react";
 import "../../style/dataTable.css";
-import {
-  Typography,
-  Box,
-  Button,
-  Skeleton,
-} from "@mui/material";
+import { Typography, Box, Button, Skeleton, Paper } from "@mui/material";
 import {
   expenseType,
   setOpenFilterDrawer,
@@ -22,12 +17,18 @@ interface dataTableProps {
   expense: [] | expenseType[];
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   projectExpense: boolean;
+  totalExpense: number;
+  dailyExpense: boolean;
+  projectName?: string;
 }
 
 const DataTable: FC<dataTableProps> = ({
   expense,
   dispatch,
   projectExpense,
+  totalExpense,
+  dailyExpense,
+  projectName,
 }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -53,7 +54,7 @@ const DataTable: FC<dataTableProps> = ({
             color: "#374151",
           }}
         >
-          Daily Expense Tracker
+          {dailyExpense ? "Today's Expense Tracker" : projectName}
         </Typography>
 
         <Button
@@ -120,6 +121,34 @@ const DataTable: FC<dataTableProps> = ({
           )}
         </Box>
       )}
+
+      {totalExpense > 0 ? (
+        <Paper
+          elevation={3}
+          sx={{
+            mt: 2,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="h6">Total:</Typography>
+          <Typography variant="h6"> &#x20B9;{totalExpense}</Typography>
+        </Paper>
+      ) : (
+        <Skeleton
+          sx={{
+            mt: 2,
+            p: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "90px",
+          }}
+        />
+      )}
+      {/* Total displayed in Paper */}
     </Box>
   );
 };
