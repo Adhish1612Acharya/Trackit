@@ -1,7 +1,6 @@
 import NavigateBoxBtns from "@/components/NavigateBoxBtns";
 import { useNavigate } from "react-router-dom";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import { useEffect } from "react";
 
 const OwnerHome = () => {
   const navigate = useNavigate();

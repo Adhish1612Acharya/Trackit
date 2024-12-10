@@ -30,7 +30,7 @@ const pages = [
 function NavBar() {
   const [open, setOpen] = useState(false);
 
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+  const [_anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
     null
   );
 

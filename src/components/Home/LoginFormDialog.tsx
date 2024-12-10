@@ -36,7 +36,6 @@ import {
 import LoginForm from "./LoginForm";
 import {
   googleLogin,
-  setIsOwner,
   signUpValueObj,
   valueObj,
 } from "@/store/features/Home/Home";
@@ -153,7 +152,7 @@ const LoginFormDialog: FC<props> = ({
                 bgcolor: owner ? "#FF7043" : "#512DA8",
                 "&:hover": { bgcolor: owner ? "#D84315" : "#311B92" },
               }}
-              onClick={() => dispatch(setIsOwner(owner))}
+              // onClick={() => dispatch(setIsOwner(owner))}
             >
               {!signUpPage
                 ? owner
