@@ -1,5 +1,5 @@
 import { auth, db, signInWithGooglePopPup } from "@/firebaseconfig";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -10,7 +10,6 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 interface initialStateType {
   loginLoad: boolean;
   loggedIn: boolean;
-  roleIsOwner: boolean | undefined;
   googleLoginLoad: boolean;
 }
 
@@ -37,7 +36,6 @@ export interface signUpValueObj {
 const initialState: initialStateType = {
   loginLoad: false,
   loggedIn: false,
-  roleIsOwner: undefined,
   googleLoginLoad: false,
 };
 
@@ -80,7 +78,7 @@ export const login = createAsyncThunk(
     );
     const user = auth.currentUser;
     const docRef = doc(db, "users", `${user?.uid}`);
-     await getDoc(docRef);
+    await getDoc(docRef);
     return {
       uid: resp.user.uid,
       email: resp.user.email,
@@ -114,18 +112,13 @@ export const googleLogin = createAsyncThunk(
     } catch (err) {
       console.log("Error : ", err);
     }
-   
   }
 );
 
 export const LoginSlice = createSlice({
   name: "login",
   initialState,
-  reducers: {
-    setIsOwner: (state, action: PayloadAction<boolean>) => {
-      state.roleIsOwner = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // Login
 
@@ -172,13 +165,12 @@ export const LoginSlice = createSlice({
       state.loggedIn = true;
     });
 
-    builder.addCase(googleLogin.rejected, (state, action) => {
+    builder.addCase(googleLogin.rejected, (state, _action) => {
       state.googleLoginLoad = false;
-      console.log("error : ", action.payload);
       toast.error("Either username or email is not correct");
     });
   },
 });
 
 export default LoginSlice.reducer;
-export const { setIsOwner } = LoginSlice.actions;
+// export const { setIsOwner } = LoginSlice.actions;

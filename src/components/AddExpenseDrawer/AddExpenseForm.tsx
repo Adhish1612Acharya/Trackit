@@ -178,7 +178,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
             style={{
               display: "flex",
               gap: "1rem",
-              flexWrap: "wrap",
+              // flexWrap: "wrap",
             }}
           >
             <FormField

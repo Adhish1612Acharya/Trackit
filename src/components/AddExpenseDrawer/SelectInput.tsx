@@ -1,4 +1,4 @@
-import  { forwardRef } from "react";
+import { forwardRef } from "react";
 import {
   Select,
   SelectContent,
@@ -30,14 +30,8 @@ type selectInputProps = {
 // Forward ref in the SelectInput component
 const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
   (props, ref) => {
-    const {
-      options,
-      title,
-      field,
-      setMiscelleneousInput,
-      form,
-      filterSelect,
-    } = props;
+    const { options, title, field, setMiscelleneousInput, form, filterSelect } =
+      props;
 
     return (
       <div ref={ref}>
@@ -64,7 +58,7 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={`Select ${title}`} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent side={title === "Payment Mode" ? "bottom" : "right"}>
             <SelectGroup>
               <SelectLabel>Paid To</SelectLabel>
               {options.map((option) => {

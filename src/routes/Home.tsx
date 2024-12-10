@@ -67,14 +67,13 @@ const StyledButton = styled(Button)({
 });
 
 const Home = () => {
-  const {  setIsLoggedIn } = useLogin();
+  const { setIsLoggedIn } = useLogin();
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const loginLoad = useAppSelector((state) => state.home.loginLoad);
   const loggedIn = useAppSelector((state) => state.home.loggedIn);
-  const isOwner = useAppSelector((state) => state.home.roleIsOwner);
   const googleLoginLoad = useAppSelector((state) => state.home.googleLoginLoad);
 
   const handleLoginSubmit = async (value: valueObj) => {
@@ -100,7 +99,7 @@ const Home = () => {
     if (loggedIn === true) {
       navigate("/u/home");
     }
-  }, [loggedIn, navigate, isOwner]);
+  }, [loggedIn, navigate]);
 
   return (
     <BackgroundContainer>

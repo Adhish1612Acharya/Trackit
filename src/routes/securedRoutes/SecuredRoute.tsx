@@ -1,4 +1,4 @@
-import  { useEffect } from "react";
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { Navigate, Outlet } from "react-router-dom";
 import { checkLogin } from "@/store/features/securedRoutes/SecureRoute";
@@ -20,13 +20,7 @@ const SecuredRoute = () => {
     } else {
       setIsLoggedIn(false);
     }
-  });
-
-  // useEffect(() => {
-  //   if (roleIsOwner === false) {
-  //     navigate("/engineer");
-  //   }
-  // }, [roleIsOwner, navigate]);
+  }, [loggedIn]);
 
   if (loggedIn == null) {
     return (
