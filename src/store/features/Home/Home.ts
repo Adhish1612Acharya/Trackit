@@ -1,5 +1,5 @@
 import { auth, db, signInWithGooglePopPup } from "@/firebaseconfig";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -9,7 +9,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 
 interface initialStateType {
   loginLoad: boolean;
-  loggedIn: boolean;
+  loggedIn: boolean | undefined;
   googleLoginLoad: boolean;
 }
 
@@ -35,7 +35,7 @@ export interface signUpValueObj {
 
 const initialState: initialStateType = {
   loginLoad: false,
-  loggedIn: false,
+  loggedIn: undefined,
   googleLoginLoad: false,
 };
 
@@ -118,7 +118,11 @@ export const googleLogin = createAsyncThunk(
 export const LoginSlice = createSlice({
   name: "login",
   initialState,
-  reducers: {},
+  reducers: {
+    setLoggedIn: (state, action: PayloadAction<boolean>) => {
+      state.loggedIn = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     // Login
 
@@ -146,7 +150,7 @@ export const LoginSlice = createSlice({
     builder.addCase(signUp.fulfilled, (state, _action) => {
       state.loginLoad = false;
       state.loggedIn = true;
-      toast.success("Logged In successfully");
+      toast.success("Email or username  is already taken");
     });
 
     builder.addCase(signUp.rejected, (state, _action) => {
@@ -173,4 +177,4 @@ export const LoginSlice = createSlice({
 });
 
 export default LoginSlice.reducer;
-// export const { setIsOwner } = LoginSlice.actions;
+export const { setLoggedIn } = LoginSlice.actions;

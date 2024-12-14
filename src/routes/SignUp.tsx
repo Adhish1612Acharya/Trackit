@@ -2,16 +2,24 @@ import SignUpForm from "@/components/SignUpForm";
 import { Card } from "@/components/ui/card";
 import {
   googleLogin,
+  setLoggedIn,
   signUp,
   signUpValueObj,
   valueObj,
 } from "@/store/features/Home/Home";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import styled from "@emotion/styled";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import GoogleIcon from "@mui/icons-material/Google";
+import { auth } from "@/firebaseconfig";
 
 const backgroundImageUrl =
   "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
@@ -80,18 +88,33 @@ const SignUp = () => {
 
   const loginLoad = useAppSelector((state) => state.home.loginLoad);
   const loggedIn = useAppSelector((state) => state.home.loggedIn);
+  const googleLoginLoad = useAppSelector((state) => state.home.googleLoginLoad);
 
   const handleSignUpSubmit = (value: signUpValueObj | valueObj) => {
     dispatch(signUp({ value: value as signUpValueObj }));
   };
 
   useEffect(() => {
-    if (loggedIn) {
-      navigate("/dashboard");
+    async function checkLoggedIn() {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          dispatch(setLoggedIn(true));
+          navigate("/u/home");
+        } else {
+          dispatch(setLoggedIn(false));
+        }
+      });
+    }
+    checkLoggedIn();
+  }, []);
+
+  useEffect(() => {
+    if (loggedIn === true) {
+      navigate("/u/home");
     }
   }, [loggedIn, navigate]);
 
-  return (
+  return loggedIn === false ? (
     <BackgroundContainer>
       <CardContainer>
         <FormHeader>Create An Account</FormHeader>
@@ -101,14 +124,18 @@ const SignUp = () => {
         />
         <Divider>OR</Divider>
         <br />
-        <StyledButton
-          fullWidth
-          startIcon={<GoogleIcon />}
-          onClick={() => dispatch(googleLogin())}
-          disabled={loginLoad}
-        >
-          Sign In with Google
-        </StyledButton>
+        {googleLoginLoad ? (
+          <CircularProgress />
+        ) : (
+          <StyledButton
+            fullWidth
+            startIcon={<GoogleIcon />}
+            onClick={() => dispatch(googleLogin())}
+          >
+            Sign In with Google
+          </StyledButton>
+        )}
+
         <Typography variant="body2" style={{ marginTop: "1rem" }}>
           Already have an account?{" "}
           <Link to="/" style={{ color: "#2575fc", fontWeight: "bold" }}>
@@ -117,6 +144,8 @@ const SignUp = () => {
         </Typography>
       </CardContainer>
     </BackgroundContainer>
+  ) : (
+    <CircularProgress />
   );
 };
 

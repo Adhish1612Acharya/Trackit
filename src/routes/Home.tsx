@@ -1,7 +1,18 @@
-import { googleLogin, login, valueObj } from "@/store/features/Home/Home";
+import {
+  googleLogin,
+  login,
+  setLoggedIn,
+  valueObj,
+} from "@/store/features/Home/Home";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import styled from "@emotion/styled";
-import { Box, Button, Divider, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Typography,
+} from "@mui/material";
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -82,14 +93,18 @@ const Home = () => {
 
   useEffect(() => {
     async function checkLoggedIn() {
+      console.log("checkLogin");
       auth.onAuthStateChanged((user) => {
         if (user) {
+          dispatch(setLoggedIn(true));
           navigate("/u/home");
+        } else {
+          dispatch(setLoggedIn(false));
         }
       });
     }
     checkLoggedIn();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     setIsLoggedIn(false);
@@ -101,7 +116,7 @@ const Home = () => {
     }
   }, [loggedIn, navigate]);
 
-  return (
+  return loggedIn === false ? (
     <BackgroundContainer>
       <CardContainer>
         <FormHeader>Login to Your Account</FormHeader>
@@ -111,14 +126,19 @@ const Home = () => {
         />
         <Divider>OR</Divider>
         <br />
-        <StyledButton
-          fullWidth
-          startIcon={<GoogleIcon />}
-          onClick={() => dispatch(googleLogin())}
-          disabled={googleLoginLoad}
-        >
-          Sign In with Google
-        </StyledButton>
+        {googleLoginLoad ? (
+          <CircularProgress />
+        ) : (
+          <StyledButton
+            fullWidth
+            startIcon={<GoogleIcon />}
+            onClick={() => dispatch(googleLogin())}
+            disabled={googleLoginLoad}
+          >
+            Sign In with Google
+          </StyledButton>
+        )}
+
         <Typography variant="body2" style={{ marginTop: "1rem" }}>
           Don't have an account?{" "}
           <Link to="/sign-up" style={{ color: "#2575fc", fontWeight: "bold" }}>
@@ -127,6 +147,8 @@ const Home = () => {
         </Typography>
       </CardContainer>
     </BackgroundContainer>
+  ) : (
+    <CircularProgress />
   );
 };
 
