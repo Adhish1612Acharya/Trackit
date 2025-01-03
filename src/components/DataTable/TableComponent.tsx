@@ -13,16 +13,28 @@ import {
 } from "@mui/material";
 import ReasonField from "./ReasonField";
 import { expenseType } from "@/store/features/DailyExpense";
-import { useAppSelector } from "@/store/store";
+import { RootState } from "@/store/store";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { Action, ThunkDispatch } from "@reduxjs/toolkit";
+import {
+  getExpenseDetails,
+  setDeleteConformationDrawerOpen,
+  setEditDrawerOpen,
+} from "@/store/features/EditDeleteExpense";
 
 interface tableComponentProps {
   expense: expenseType[] | [];
   projectExpense: boolean;
+  dispatch: ThunkDispatch<RootState, undefined, Action>;
+  dataTableLoader: boolean;
 }
 
 const TableComponent: FC<tableComponentProps> = ({
   expense,
   projectExpense,
+  dispatch,
+  dataTableLoader,
 }) => {
   return (
     <TableContainer
@@ -45,6 +57,7 @@ const TableComponent: FC<tableComponentProps> = ({
               "Payment Mode",
               "Reason",
               "Project",
+              "Options",
             ].map((header) => (
               <TableCell
                 key={header}
@@ -56,87 +69,100 @@ const TableComponent: FC<tableComponentProps> = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {useAppSelector((state) =>
-            state.addDailyExpense.dataTableLoader ? (
+          {dataTableLoader ? (
+            <TableRow>
+              <TableCell colSpan={8} align="center">
+                <CircularProgress />
+              </TableCell>
+            </TableRow>
+          ) : expense.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={8} align="center">
+                <Typography variant="h6">No expense added</Typography>
+              </TableCell>
+            </TableRow>
+          ) : (
+            expense.map((eachExpense, index) => (
               <TableRow
-                key={-1}
+                key={index + 1}
                 sx={{
-                  backgroundColor: "white",
+                  backgroundColor: index % 2 === 0 ? "#f9fafb" : "white",
                   "&:hover": { backgroundColor: "#f3f4f6" },
-                  height: "100px",
-                  display: "flex", // Enable flexbox
-                  justifyContent: "center", // Center horizontally
-                  alignItems: "center", // Center vertically
                 }}
               >
-                <TableCell
-                  colSpan={7} // Spans across all columns
-                  sx={{
-                    borderBottom: "none", // Remove bottom border
-                    textAlign: "center", // Center text in case of other content
-                  }}
-                >
-                  <CircularProgress style={{ marginLeft: "auto" }} />
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>
+                  {typeof eachExpense.date === "string" ? eachExpense.date : ""}
+                  {projectExpense ? null : (
+                    <>
+                      <br />
+                      <small>(today)</small>
+                    </>
+                  )}
+                </TableCell>
+                <TableCell sx={{ color: "#059669", fontWeight: "bold" }}>
+                  &#x20B9;{eachExpense.amount}
+                </TableCell>
+                <TableCell>
+                  {eachExpense.miscellaneous ? (
+                    <Tooltip title={eachExpense.miscellaneuosPaidToName} arrow>
+                      <Typography
+                        variant="body2"
+                        style={{ cursor: "pointer" }}
+                        color="text.primary"
+                      >
+                        {eachExpense.miscellaneousPaidToRole}
+                        <br />
+                        <small>
+                          Name : {eachExpense.miscellaneuosPaidToName}
+                        </small>
+                        <br />
+                        <small>(miscellaneous)</small>
+                      </Typography>
+                    </Tooltip>
+                  ) : (
+                    eachExpense.paidToName
+                  )}
+                </TableCell>
+                <TableCell>{eachExpense.paymentModeName}</TableCell>
+                <TableCell>
+                  <ReasonField reason={eachExpense.reason} />
+                </TableCell>
+                <TableCell>{eachExpense.projectTitle}</TableCell>
+                <TableCell>
+                  <EditIcon
+                    style={{
+                      cursor: "pointer",
+                      color: "green",
+                      marginRight: "1rem",
+                    }}
+                    onClick={() => {
+                      dispatch(
+                        setEditDrawerOpen({
+                          id: eachExpense.expenseId,
+                          open: true,
+                          dailyExpenseOrNot: false,
+                        })
+                      );
+
+                      dispatch(getExpenseDetails(eachExpense.expenseId));
+                    }}
+                  />
+
+                  <DeleteIcon
+                    style={{ cursor: "pointer", color: "red" }}
+                    onClick={() => {
+                      dispatch(
+                        setDeleteConformationDrawerOpen({
+                          open: true,
+                          expenseId: eachExpense.expenseId,
+                        })
+                      );
+                    }}
+                  />
                 </TableCell>
               </TableRow>
-            ) : expense.length === 0 ? (
-              <TableCell>
-                <h1>No expense added</h1>
-              </TableCell>
-            ) : (
-              expense.map((eachExpense, index) => (
-                <TableRow
-                  key={index + 1}
-                  sx={{
-                    backgroundColor: index % 2 === 0 ? "#f9fafb" : "white",
-                    "&:hover": { backgroundColor: "#f3f4f6" },
-                  }}
-                >
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>
-                    {eachExpense.date}{" "}
-                    {projectExpense ? null : (
-                      <>
-                        <br />
-                        <small>(today)</small>
-                      </>
-                    )}
-                  </TableCell>
-                  <TableCell sx={{ color: "#059669", fontWeight: "bold" }}>
-                    &#x20B9;{eachExpense.amount}
-                  </TableCell>
-                  <TableCell>
-                    {eachExpense.miscellaneous ? (
-                      <Tooltip
-                        title={eachExpense.miscellaneuosPaidToName}
-                        arrow
-                      >
-                        <Typography
-                          variant="body2"
-                          style={{ cursor: "pointer" }}
-                          color="text.primary"
-                        >
-                          {eachExpense.miscellaneousPaidToRole}
-                          <br />
-                          <small>
-                            Name : {eachExpense.miscellaneuosPaidToName}
-                          </small>
-                          <br />
-                          <small>(miscellaneous)</small>
-                        </Typography>
-                      </Tooltip>
-                    ) : (
-                      eachExpense.paidToName
-                    )}
-                  </TableCell>
-                  <TableCell>{eachExpense.paymentModeName}</TableCell>
-                  <TableCell>
-                    <ReasonField reason={eachExpense.reason} />
-                  </TableCell>
-                  <TableCell>{eachExpense.projectTitle}</TableCell>
-                </TableRow>
-              ))
-            )
+            ))
           )}
         </TableBody>
       </Table>

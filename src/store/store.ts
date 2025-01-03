@@ -5,6 +5,7 @@ import securedRouteReducer from "./features/securedRoutes/SecureRoute";
 import dailyExpenseReducer from "./features/DailyExpense";
 import projectListDetailsReducer from "./features/GetProjects";
 import getProjectExpenseReducer from "./features/ProjectDetails";
+import editAndDeleteExpenseReducer from "./features/EditDeleteExpense";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     addDailyExpense: dailyExpenseReducer,
     getProjectDetails: projectListDetailsReducer,
     getProjectExpense: getProjectExpenseReducer,
+    editDeleteExpense: editAndDeleteExpenseReducer,
   },
 });
 

@@ -58,7 +58,12 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={`Select ${title}`} />
           </SelectTrigger>
-          <SelectContent side={title === "Payment Mode" ? "bottom" : "right"}>
+          <SelectContent
+            style={{
+              zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
+            }}
+            side={title === "Payment Mode" ? "bottom" : "right"}
+          >
             <SelectGroup>
               <SelectLabel>Paid To</SelectLabel>
               {options.map((option) => {

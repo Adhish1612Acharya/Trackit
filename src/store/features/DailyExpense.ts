@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   addDoc,
   arrayUnion,
@@ -20,7 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 
 interface GetUserDailyExpenseResponse {
   userData: any; // Replace `any` with the proper type of your user data if known
-  dailyExpense: formValueType[] | []; // Replace `any` with the correct type for expense data
+  dailyExpense: expenseType[] | []; // Replace `any` with the correct type for expense data
   total: number;
 }
 
@@ -36,7 +36,8 @@ export interface formValueType {
 }
 
 export interface expenseType {
-  date: string;
+  expenseId: string;
+  date: string | Date;
   amount: number;
   paidToId: string;
   paidToName: string;
@@ -90,9 +91,7 @@ const initialState: initialStateType = {
   projectsOptions: [],
   filterProjects: [],
   openAddExpenseDrawer: false,
-
   openAddProjectDrawer: false,
-
   pageLoading: true,
   expense: [],
   miscellaneousInput: false,
@@ -136,7 +135,7 @@ export const getUserDailyExpense = createAsyncThunk<
           const querySnapShot = await getDocs(userExpenseQuery);
 
           const dailyExpense = querySnapShot.docs.map((doc) => {
-            const eachDoc = doc.data() as formValueType;
+            const eachDoc = doc.data() as expenseType;
 
             const formattedDate = (
               eachDoc.date instanceof Timestamp
@@ -153,6 +152,8 @@ export const getUserDailyExpense = createAsyncThunk<
 
             eachDoc.date = formattedDate;
 
+            eachDoc.expenseId = doc.id;
+
             return eachDoc;
           });
 
@@ -160,8 +161,6 @@ export const getUserDailyExpense = createAsyncThunk<
             (accum, eachExpense) => accum + Number(eachExpense.amount),
             0
           );
-
-          console.log(total);
 
           // Get user document
           const userDocRef = doc(db, "users", user.uid);
@@ -530,6 +529,23 @@ const dailyExpenseSlice = createSlice({
     setOpenFilterDrawer: (state, action) => {
       state.openFilterDrawer = action.payload;
     },
+    setEditedExpenseInfo: (state, action: PayloadAction<expenseType>) => {
+      state.expense = state.expense.map((eachExpense) => {
+        return eachExpense.expenseId === action.payload.expenseId
+          ? { ...eachExpense, ...action.payload }
+          : eachExpense;
+      });
+    },
+    setDeletedExpenseInfo: (state, action: PayloadAction<string>) => {
+      state.expense = state.expense.filter((eachExpense) => {
+        return eachExpense.expenseId !== action.payload;
+      });
+
+      state.totalValue = state.expense.reduce(
+        (accum, eachExpense) => accum + Number(eachExpense.amount),
+        0
+      );
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserDailyExpense.pending, (state, _action) => {
@@ -561,6 +577,7 @@ const dailyExpenseSlice = createSlice({
       state.addExpenseBtnLoad = false;
 
       if (action.payload.todayExpense !== null) {
+        action.payload.todayExpense.expenseId = action.payload.expenseId;
         state.expense.push(action.payload.todayExpense);
         state.totalValue += action.payload.todayExpense.amount;
       }
@@ -626,4 +643,6 @@ export const {
   initializeProjectOptions,
   setMiscellaneousInput,
   setOpenFilterDrawer,
+  setEditedExpenseInfo,
+  setDeletedExpenseInfo,
 } = dailyExpenseSlice.actions;

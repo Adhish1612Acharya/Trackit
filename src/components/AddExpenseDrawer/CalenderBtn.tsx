@@ -37,7 +37,21 @@ const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto p-0"
+        side="top"
+        align="start"
+        style={{
+          zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
+        }}
+        onInteractOutside={(event) => {
+          // Cast the target to Element to access `closest`
+          const target = event.target as Element;
+          if (target.closest(".calendar")) {
+            event.preventDefault(); // Prevent the popover from closing
+          }
+        }}
+      >
         <Calendar
           className="calendar bg-white text-black border-gray-300"
           mode="single"

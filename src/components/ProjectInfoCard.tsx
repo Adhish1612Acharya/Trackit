@@ -6,6 +6,7 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { NavigateFunction } from "react-router-dom";
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
 interface ProjectInfoProps {
   title: string;
@@ -44,6 +45,7 @@ const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
             </Typography>
             {/* Budget Badge */}
             <div className="bg-white text-blue-700 text-sm font-semibold px-3 py-1 rounded-full shadow-md">
+              <CurrencyRupeeIcon />
               {budget}
             </div>
           </div>

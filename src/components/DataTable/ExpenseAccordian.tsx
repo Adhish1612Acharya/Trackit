@@ -5,11 +5,22 @@ import {
   Typography,
   Box,
   Tooltip,
+  Button,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ReasonField from "./ReasonField";
-import { expenseType } from "@/store/features/DailyExpense";
+import {
+  expenseType,
+  setDeletedExpenseInfo,
+} from "@/store/features/DailyExpense";
 import { FC } from "react";
+import { Action, ThunkDispatch } from "@reduxjs/toolkit";
+import { RootState } from "@/store/store";
+import {
+  getExpenseDetails,
+  setDeleteConformationDrawerOpen,
+  setEditDrawerOpen,
+} from "@/store/features/EditDeleteExpense";
 
 interface expenseAccordianProps {
   index: number;
@@ -17,6 +28,7 @@ interface expenseAccordianProps {
   openIndex: number | null;
   eachExpense: expenseType;
   projectExpense: boolean;
+  dispatch: ThunkDispatch<RootState, undefined, Action>;
 }
 
 const ExpenseAccordian: FC<expenseAccordianProps> = ({
@@ -25,6 +37,7 @@ const ExpenseAccordian: FC<expenseAccordianProps> = ({
   openIndex,
   eachExpense,
   projectExpense,
+  dispatch,
 }) => {
   return (
     <Accordion
@@ -48,7 +61,7 @@ const ExpenseAccordian: FC<expenseAccordianProps> = ({
             {index + 1}
           </Typography>
           <Typography variant="body1">
-            {eachExpense.date}
+            {typeof eachExpense.date === "string" ? eachExpense.date : ""}
             {projectExpense ? null : (
               <>
                 <br />
@@ -138,6 +151,50 @@ const ExpenseAccordian: FC<expenseAccordianProps> = ({
               {eachExpense.projectTitle}
             </Typography>
           </Box>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-evenly",
+            gap: 1,
+            marginTop: "1rem",
+          }}
+        >
+          <Button
+            variant="contained"
+            className="w-1/2"
+            color="success"
+            onClick={() => {
+              dispatch(
+                setEditDrawerOpen({
+                  id: eachExpense.expenseId,
+                  open: true,
+                  dailyExpenseOrNot: false,
+                })
+              );
+
+              dispatch(getExpenseDetails(eachExpense.expenseId));
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            onClick={() => {
+              dispatch(
+                setDeleteConformationDrawerOpen({
+                  open: true,
+                  expenseId: eachExpense.expenseId,
+                })
+              );
+              dispatch(setDeletedExpenseInfo(eachExpense.expenseId));
+            }}
+            variant="contained"
+            className="w-1/2"
+            color="error"
+          >
+            Delete
+          </Button>
         </Box>
       </AccordionDetails>
     </Accordion>

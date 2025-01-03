@@ -10,7 +10,7 @@ import ExpenseAccordian from "./ExpenseAccordian";
 import TableComponent from "./TableComponent";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState, useAppSelector } from "@/store/store";
+import { RootState} from "@/store/store";
 import { setProjectDetailsOpenFilterDrawer } from "@/store/features/ProjectDetails";
 
 interface dataTableProps {
@@ -20,6 +20,7 @@ interface dataTableProps {
   totalExpense: number;
   dailyExpense: boolean;
   projectName?: string;
+  dataTableLoader: boolean;
 }
 
 const DataTable: FC<dataTableProps> = ({
@@ -29,6 +30,7 @@ const DataTable: FC<dataTableProps> = ({
   totalExpense,
   dailyExpense,
   projectName,
+  dataTableLoader,
 }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -112,10 +114,15 @@ const DataTable: FC<dataTableProps> = ({
       )}
 
       {/* PC View - Table */}
-      <TableComponent expense={expense} projectExpense={projectExpense} />
+      <TableComponent
+        dispatch={dispatch}
+        expense={expense}
+        projectExpense={projectExpense}
+        dataTableLoader={dataTableLoader}
+      />
 
       {/* Mobile View - Accordion */}
-      {useAppSelector((state) => state.addDailyExpense.dataTableLoader) ? (
+      {dataTableLoader ? (
         <Skeleton
           sx={{
             display: { xs: "block", sm: "block", md: "none" },
@@ -144,6 +151,7 @@ const DataTable: FC<dataTableProps> = ({
           ) : (
             expense.map((eachExpense, index) => (
               <ExpenseAccordian
+                dispatch={dispatch}
                 key={index}
                 index={index}
                 openIndex={openIndex}

@@ -11,10 +11,17 @@ import {
 import AddExpenseDrawer from "@/components/AddExpenseDrawer/AddExpenseDrawer";
 import FilterDrawer from "@/components/FilterDrawer";
 import { useLogin } from "@/Context/LoginProviderContext";
+import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
+import { setDeleteConformationDrawerOpen } from "@/store/features/EditDeleteExpense";
 
 const DailyExpense = () => {
   const dispatch = useAppDispatch();
   const { setIsLoggedIn } = useLogin();
+
+  const dataTableLoader = useAppSelector(
+    (state) => state.addDailyExpense.dataTableLoader
+  );
+
   const openAddExpenseDrawer = useAppSelector(
     (state) => state.addDailyExpense.openAddExpenseDrawer
   );
@@ -40,13 +47,25 @@ const DailyExpense = () => {
     (state) => state.addDailyExpense.totalValue
   );
 
-  // const submit = useAppSelector(
-  //   (state) => state.addDailyExpense.submitAddDailyExpense
-  // );
+  const openAlertDialog = useAppSelector(
+    (state) => state.editDeleteExpense.deleteConformationDrawerOpen
+  );
+
+  const deleteFuncLoad = useAppSelector(
+    (state) => state.editDeleteExpense.deleteFuncLoad
+  );
+
+  const expenseId = useAppSelector(
+    (state) => state.editDeleteExpense.expenseId
+  );
 
   useEffect(() => {
     dispatch(getUserDailyExpense());
   }, [dispatch, setIsLoggedIn]);
+
+  useEffect(() => {
+    dispatch(setDeleteConformationDrawerOpen({ open: false, expenseId: "" }));
+  }, [dispatch]);
 
   return (
     <Container className="max-w-full">
@@ -56,6 +75,7 @@ const DailyExpense = () => {
         projectExpense={false}
         totalExpense={totalValue}
         dailyExpense={true}
+        dataTableLoader={dataTableLoader}
       />
 
       {/* Floating Action Button */}
@@ -85,6 +105,13 @@ const DailyExpense = () => {
         dispatch={dispatch}
         projectExpense={false}
         projectId={""}
+      />
+      <ConformationAlertDialog
+        openAlertDialog={openAlertDialog}
+        dispatch={dispatch}
+        expenseId={expenseId}
+        deleteFuncLoad={deleteFuncLoad}
+        dailyExpensePage={true}
       />
     </Container>
   );

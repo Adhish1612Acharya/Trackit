@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { expenseType, formValueType, projectOptionsType } from "./DailyExpense";
 import { auth, db } from "@/firebaseconfig";
 import {
@@ -11,7 +11,6 @@ import {
   where,
 } from "firebase/firestore";
 import { toast } from "react-toastify";
-
 
 interface initialStateType {
   expense: expenseType[];
@@ -78,13 +77,12 @@ export const getUserProjectExpense = createAsyncThunk<
               .join("-");
 
             eachDoc.date = formattedDate;
+            eachDoc.expenseId = doc.id;
 
             return eachDoc;
           });
 
           let total = 0;
-
-          console.log(dailyExpense);
 
           if (dailyExpense.length > 0) {
             total = dailyExpense.reduce(
@@ -92,8 +90,6 @@ export const getUserProjectExpense = createAsyncThunk<
               0
             );
           }
-
-          console.log(total);
 
           // Get user document
           const userDocRef = doc(db, "users", user.uid);
@@ -274,6 +270,26 @@ const getProjectDetailsSlice = createSlice({
     setProjectName: (state, action) => {
       state.projectName = action.payload;
     },
+    setEditedProjectExpenseInfo: (
+      state,
+      action: PayloadAction<expenseType>
+    ) => {
+      state.expense = state.expense.map((eachExpense) => {
+        return eachExpense.expenseId === action.payload.expenseId
+          ? { ...eachExpense, ...action.payload }
+          : eachExpense;
+      });
+    },
+    setDeletedProjectExpenseInfo: (state, action: PayloadAction<string>) => {
+      state.expense = state.expense.filter((eachExpense) => {
+        return eachExpense.expenseId !== action.payload;
+      });
+
+      state.total = state.expense.reduce(
+        (accum, eachExpense) => accum + Number(eachExpense.amount),
+        0
+      );
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserProjectExpense.pending, (state, _action) => {
@@ -318,5 +334,9 @@ const getProjectDetailsSlice = createSlice({
 });
 
 export default getProjectDetailsSlice.reducer;
-export const { setProjectDetailsOpenFilterDrawer, setProjectName } =
-  getProjectDetailsSlice.actions;
+export const {
+  setProjectDetailsOpenFilterDrawer,
+  setProjectName,
+  setEditedProjectExpenseInfo,
+  setDeletedProjectExpenseInfo,
+} = getProjectDetailsSlice.actions;
