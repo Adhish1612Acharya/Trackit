@@ -20,6 +20,7 @@ import { RootState, useAppSelector } from "@/store/store";
 import {
   addDailyExpense,
   expenseType,
+  getUserDailyExpense,
   projectOptionsType,
   setMiscellaneousInput,
   setOpenAddExpenseDrawer,
@@ -43,8 +44,8 @@ interface addExpenseFormProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   projectOptions: projectOptionsType[];
   editForm?: boolean;
-  expense: expenseType;
-  editExpenseCurrentProject: { id: string; name: string };
+  expense?: expenseType;
+  editExpenseCurrentProject?: { id: string; name: string };
 }
 
 const AddExpenseForm: FC<addExpenseFormProps> = ({
@@ -57,17 +58,17 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   const form = useForm<z.infer<typeof addExpenseFormSchema>>({
     resolver: zodResolver(addExpenseFormSchema),
     defaultValues: {
-      date: editForm ? convertDateFormat(String(expense.date)) : new Date(),
-      amount: editForm ? String(expense.amount) : "0",
-      reason: editForm ? expense.reason : "",
-      paidTo: editForm ? expense.paidToId : undefined,
-      paymentMode: editForm ? expense.paymentModeId : undefined,
-      project: editForm ? editExpenseCurrentProject.id : undefined,
+      date: editForm ? convertDateFormat(String(expense?.date)) : new Date(),
+      amount: editForm ? String(expense?.amount) : "0",
+      reason: editForm ? expense?.reason : "",
+      paidTo: editForm ? expense?.paidToId : undefined,
+      paymentMode: editForm ? expense?.paymentModeId : undefined,
+      project: editForm ? editExpenseCurrentProject?.id : undefined,
       miscellaneousPaidToName: editForm
-        ? expense.miscellaneuosPaidToName
+        ? expense?.miscellaneuosPaidToName
         : "null",
       miscellaneousPaidToRole: editForm
-        ? expense.miscellaneousPaidToRole
+        ? expense?.miscellaneousPaidToRole
         : "null",
     },
   });
@@ -81,7 +82,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   }
 
   const onSubmit = async (formData: z.infer<typeof addExpenseFormSchema>) => {
-    if (editForm) {
+    if (editForm) { 
       const editedFormData: editedFormValueType = {
         date: formData.date,
         amount: Number(formData.amount),
@@ -92,14 +93,19 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
         miscellaneousPaidToRole: formData.miscellaneousPaidToRole
           ? formData.miscellaneousPaidToRole
           : "null",
-        miscellaneuosPaidToId: editForm ? expense.miscellaneuosPaidToId : "",
+        miscellaneuosPaidToId: editForm ? expense?expense.miscellaneuosPaidToId : "":"",
         miscellaneuosPaidToName: formData.miscellaneousPaidToName
           ? formData.miscellaneousPaidToName
           : "null",
       };
 
       await dispatch(editExpenseDetails({ editFormValue: editedFormData }));
-      await dispatch(getUserProjectExpense(expense.projectId)).then(() => {});
+      if(window.location.href==="/u/daily-expense"){
+        await dispatch(getUserDailyExpense());
+      }else if (window.location.pathname.startsWith("/u/projects/")) {
+        await dispatch(getUserProjectExpense(expense?expense.projectId:""));
+      }
+     
       dispatch(
         setEditDrawerOpen({ id: "", open: false, dailyExpenseOrNot: false })
       );
@@ -147,7 +153,9 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     flex: 1,
                     marginLeft: `${editForm ? "" : "1rem"}`,
                     maxWidth: "100%",
+                
                   }}
+
                   className={editForm ? "my-2 mx-2" : ""}
                 >
                   {" "}

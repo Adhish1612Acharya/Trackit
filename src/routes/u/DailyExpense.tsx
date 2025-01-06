@@ -13,6 +13,8 @@ import FilterDrawer from "@/components/FilterDrawer";
 import { useLogin } from "@/Context/LoginProviderContext";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
 import { setDeleteConformationDrawerOpen } from "@/store/features/EditDeleteExpense";
+import EditDialog from "@/components/EditDialog/EditDialog";
+import { MobileAddExpenseDialog } from "@/components/AddExpenseDrawer/MobileAddExpenseDialog";
 
 const DailyExpense = () => {
   const dispatch = useAppDispatch();
@@ -59,6 +61,27 @@ const DailyExpense = () => {
     (state) => state.editDeleteExpense.expenseId
   );
 
+  // Edit Dialog States
+  const editDialogOpen = useAppSelector(
+    (state) => state.editDeleteExpense.editDrawerOpen
+  );
+
+  const expense = useAppSelector(
+    (state) => state.editDeleteExpense.expenseInfo
+  );
+
+  const editExpenseCurrentProject = useAppSelector(
+    (state) => state.editDeleteExpense.currrentProject
+  );
+
+  // const projectOptions = useAppSelector(
+  //   (state) => state.editDeleteExpense.editProjectOptions
+  // );
+
+  const editInfoLoad = useAppSelector(
+    (state) => state.editDeleteExpense.editInfoLoad
+  );
+
   useEffect(() => {
     dispatch(getUserDailyExpense());
   }, [dispatch, setIsLoggedIn]);
@@ -99,6 +122,13 @@ const DailyExpense = () => {
         projectOptions={projectOptions}
         // submit={submit}
       />
+      {/* <MobileAddExpenseDialog
+      openDrawer={openAddExpenseDrawer}
+      openAddProjectDrawer={openAddProjectDrawer}
+      dispatch={dispatch}
+      projectOptions={projectOptions}
+      /> */}
+
       <FilterDrawer
         open={filterDrawerOpen}
         projectOptions={filterProjectOptions}
@@ -112,6 +142,16 @@ const DailyExpense = () => {
         expenseId={expenseId}
         deleteFuncLoad={deleteFuncLoad}
         dailyExpensePage={true}
+      />
+
+    <EditDialog
+        editDialogOpen={editDialogOpen}
+        dispatch={dispatch}
+        expense={expense}
+        editExpenseCurrentProject={editExpenseCurrentProject}
+        projectOptions={projectOptions}
+        editInfoLoad={editInfoLoad}
+        // isDailyExpense={false}
       />
     </Container>
   );

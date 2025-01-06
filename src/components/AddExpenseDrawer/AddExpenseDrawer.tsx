@@ -7,12 +7,11 @@ import { FC } from "react";
 import AddProjectDrawer from "./AddProjectDrawer";
 import { projectOptionsType } from "@/store/features/DailyExpense";
 
-interface addExpenseDrawerProps {
+export interface addExpenseDrawerProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   openDrawer: boolean;
   openAddProjectDrawer: boolean;
   projectOptions: projectOptionsType[];
-  // submit: boolean;
 }
 
 const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
@@ -25,7 +24,7 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
   return (
     <Drawer
       open={openDrawer}
-
+      
       // onOpenChange={() => dispatch(setOpenAddExpenseDrawer(false))}
     >
       <DrawerContent
@@ -50,7 +49,6 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
         </DrawerTitle>
 
         <AddExpenseForm
-          // submit={submit}
           dispatch={dispatch}
           projectOptions={projectOptions}
         />

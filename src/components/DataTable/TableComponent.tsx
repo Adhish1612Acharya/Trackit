@@ -36,6 +36,7 @@ const TableComponent: FC<tableComponentProps> = ({
   dispatch,
   dataTableLoader,
 }) => {
+ 
   return (
     <TableContainer
       component={Paper}
@@ -144,8 +145,10 @@ const TableComponent: FC<tableComponentProps> = ({
                           dailyExpenseOrNot: false,
                         })
                       );
-
-                      dispatch(getExpenseDetails(eachExpense.expenseId));
+                      
+                          dispatch(getExpenseDetails(eachExpense.expenseId));
+                        
+                     
                     }}
                   />
 

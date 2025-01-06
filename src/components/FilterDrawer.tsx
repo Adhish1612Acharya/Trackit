@@ -1,11 +1,8 @@
 import { FC } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import Dialog from '@mui/material/Dialog';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import FilterForm from "./FilterForm";
 import {
   projectOptionsType,
@@ -15,6 +12,7 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
 import { setProjectDetailsOpenFilterDrawer } from "@/store/features/ProjectDetails";
 import ProjectExpenseFilterForm from "./ProjectExpenseFilterForm";
+import CloseIcon from '@mui/icons-material/Close';
 
 interface filterDrawerOpenProps {
   open: boolean;
@@ -32,28 +30,31 @@ const FilterDrawer: FC<filterDrawerOpenProps> = ({
   projectId,
 }) => {
   return (
+
     <Dialog
-      open={open}
-      onOpenChange={() =>
+    open={open}
+      onClose={() =>
         projectExpense
           ? dispatch(setProjectDetailsOpenFilterDrawer(false))
           : dispatch(setOpenFilterDrawer(false))
       }
-    >
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Apply filter</DialogTitle>
-          <DialogDescription>
-            Search daily expense based on the filters
-          </DialogDescription>
-        </DialogHeader>
-        {projectExpense ? (
+  >
+    <DialogTitle style={{display:"flex", justifyContent:"space-between"}}>Search Expense<CloseIcon style={{cursor:"pointer"}} onClick={() =>
+        projectExpense
+          ? dispatch(setProjectDetailsOpenFilterDrawer(false))
+          : dispatch(setOpenFilterDrawer(false))
+      }/></DialogTitle>
+    <DialogContent>
+      <DialogContentText>
+     Find expense based on the filter
+      </DialogContentText>
+          {projectExpense ? (
           <ProjectExpenseFilterForm dispatch={dispatch} projectId={projectId} />
-        ) : (
+       ) : (
           <FilterForm dispatch={dispatch} projectOptions={projectOptions} />
-        )}
-      </DialogContent>
-    </Dialog>
+    )}
+    </DialogContent>
+  </Dialog>
   );
 };
 

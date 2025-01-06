@@ -122,7 +122,7 @@ const FilterForm: FC<filterFormProps> = ({ dispatch, projectOptions }) => {
             // )}
             className="w-full mx-1"
           >
-            Add Expense
+            Apply
           </Button>
         )}
       </form>

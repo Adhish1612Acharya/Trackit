@@ -154,10 +154,34 @@ export const editExpenseDetails = createAsyncThunk<
         try {
           const state = thunkAPI.getState() as RootState;
 
+          let contrubutersLists=[];
+
+          let contributerData;
+
           let userProjects: {
             id: string;
             name: string;
           }[] = [];
+
+          const normalizeString = (str: string): string => {
+            return str.toLowerCase().replace(/\s+/g, "");
+          };
+
+      
+
+          const findPaidToRoleName = (id: string) => {
+            return constructionRoles.filter((role) => {
+              return String(role.id) === id;
+            });
+          };
+
+          const findPaymentModeName = (id: string) => {
+            return paymentTypes.filter((role) => {
+              return String(role.id) === id;
+            });
+          };
+
+          //To find project Title/
 
           if (
             editFormValue.projectId !==
@@ -180,17 +204,60 @@ export const editExpenseDetails = createAsyncThunk<
             });
           };
 
-          const findPaidToRoleName = (id: string) => {
-            return constructionRoles.filter((role) => {
-              return String(role.id) === id;
-            });
-          };
+          //
 
-          const findPaymentModeName = (id: string) => {
-            return paymentTypes.filter((role) => {
-              return String(role.id) === id;
-            });
-          };
+          // ----------------------Checking Contributer already exists----------------------------//
+
+
+            const projectDocRef = doc(db, "projects", editFormValue.projectId);
+
+            const projectDoc = await getDoc(projectDocRef);
+
+            const projectData = projectDoc.data();
+
+            contrubutersLists = projectData ? projectData.contributers : [];
+            
+         
+
+          const contributerExists = contrubutersLists.filter(
+            (contributer: any) =>
+              editFormValue.paidToId != "51"
+                ? contributer.id === editFormValue.paidToId
+                : normalizeString(contributer.name) ===
+                    normalizeString(
+                      editFormValue.miscellaneuosPaidToName as string
+                    ) &&
+                  normalizeString(contributer.miscellaneousRole) ===
+                    normalizeString(
+                      editFormValue.miscellaneousPaidToRole as string
+                    )
+          );
+
+          if(contributerExists.length==0){
+            if (state.editDeleteExpense.miscellaneuosInput) {
+              contributerData = {
+                id: editFormValue.paidToId,
+                name: editFormValue.miscellaneuosPaidToName as string,
+                miscellaneous: true,
+                miscellaneousRole:
+                  editFormValue.miscellaneousPaidToRole as string,
+                miscellaneousId: editFormValue.miscellaneuosPaidToId,
+              };
+            } else {
+              contributerData = {
+                id: editFormValue.paidToId,
+                name: findPaidToRoleName(editFormValue.paidToId)[0].name,
+                miscellaneous: false,
+                miscellaneousRole: null,
+                miscellaneousId: null,
+              };
+
+            }
+          }
+
+          // -------------------***Checking Contributer already exists***-------------------------//
+
+       
 
           const updatedFormValue: any = {
             date: new Date(editFormValue.date),
@@ -212,7 +279,7 @@ export const editExpenseDetails = createAsyncThunk<
               ? editFormValue.miscellaneousPaidToRole
               : "null",
             miscellaneuosPaidToId: state.editDeleteExpense.miscellaneuosInput
-              ? editFormValue.miscellaneuosPaidToId
+              ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
               : "",
             miscellaneuosPaidToName: state.editDeleteExpense.miscellaneuosInput
               ? editFormValue.miscellaneuosPaidToName
@@ -234,7 +301,6 @@ export const editExpenseDetails = createAsyncThunk<
             editFormValue.projectId !==
             state.editDeleteExpense.currrentProject.id
           ) {
-            console.log("Changing expense in project");
             const batch = writeBatch(db);
 
             // Reference to the first document
@@ -252,13 +318,32 @@ export const editExpenseDetails = createAsyncThunk<
               expenses: arrayRemove(state.editDeleteExpense.expenseId),
             });
 
-            // Update data for the second document
+               // Update data for the second document
+            if(contributerExists.length===0){
             batch.update(expenseDocRef2, {
               expenses: arrayUnion(state.editDeleteExpense.expenseId),
+              contributers:arrayUnion(contributerData)
             });
+            }else{
+              batch.update(expenseDocRef2, {
+                expenses: arrayUnion(state.editDeleteExpense.expenseId),
+              });
+            }
+
+
 
             // Commit the batch
             await batch.commit();
+          }else{
+            
+            if(contributerExists.length===0){
+              const projectDocRef = doc(db, "projects",editFormValue.projectId);
+
+              await updateDoc(projectDocRef, {
+                contributers: arrayUnion(contributerData),
+              });
+            }
+          
           }
 
           resolve({

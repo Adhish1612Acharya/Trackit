@@ -42,15 +42,13 @@ const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
         side="top"
         align="start"
         style={{
-          zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
+          zIndex: 1500, // Set higher than any other UI element
         }}
-        onInteractOutside={(event) => {
-          // Cast the target to Element to access `closest`
-          const target = event.target as Element;
-          if (target.closest(".calendar")) {
-            event.preventDefault(); // Prevent the popover from closing
-          }
-        }}
+        // onInteractOutside={(event) => {
+        //   if (event.target?.closest(".calendar")) {
+        //     event.preventDefault(); // Prevent closing
+        //   }
+        // }}
       >
         <Calendar
           className="calendar bg-white text-black border-gray-300"

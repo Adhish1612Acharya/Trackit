@@ -237,6 +237,8 @@ export const projectDetailsApplyFilter = createAsyncThunk<
 
               eachDoc.date = formattedDate;
 
+              eachDoc.expenseId=doc.id;
+
               return eachDoc;
             });
             total = filteredExpense.reduce(

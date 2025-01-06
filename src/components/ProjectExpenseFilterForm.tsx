@@ -71,6 +71,19 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem style={{ flex: 1, marginLeft: "20px" }}>
+              <FormLabel className="mr-2">Choose Date</FormLabel>
+              <FormControl>
+                <CalenderBtn field={field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="paidToId"
@@ -113,19 +126,7 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem style={{ flex: 1, marginLeft: "20px" }}>
-              <FormLabel>Project Type</FormLabel>
-              <FormControl>
-                <CalenderBtn field={field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
         {useAppSelector((state) => state.addDailyExpense.addFilterBtnLoad) ? (
           <Button className="w-full mx-1" disabled>
             <Loader2 className="animate-spin" />
@@ -140,7 +141,7 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
             // )}
             className="w-full mx-1"
           >
-            Add Expense
+            Apply
           </Button>
         )}
       </form>

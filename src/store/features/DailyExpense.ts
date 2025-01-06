@@ -203,6 +203,28 @@ export const addDailyExpense = createAsyncThunk<
         try {
           const state = thunkAPI.getState() as RootState;
 
+          const projectDocRef = doc(db, "projects", value.project);
+
+          const projectDoc = await getDoc(projectDocRef);
+
+          const projectData = projectDoc.data();
+
+          const contrubutersLists = projectData ? projectData.contributers : [];
+
+          const normalizeString = (str: string): string => {
+            return str.toLowerCase().replace(/\s+/g, "");
+          };
+
+          const contributerExists = contrubutersLists.filter(
+            (contributer: any) =>
+              value.paidTo != "51"
+                ? contributer.id === value.paidTo
+                : normalizeString(contributer.name) ===
+                    normalizeString(value.miscellaneousPaidToName as string) &&
+                  normalizeString(contributer.miscellaneousRole) ===
+                    normalizeString(value.miscellaneousPaidToRole as string)
+          );
+
           const findProjectTitle = (id: string) => {
             return state.addDailyExpense.projectsOptions.filter((p) => {
               return p.id === id;
@@ -227,10 +249,8 @@ export const addDailyExpense = createAsyncThunk<
 
           const paymentModeName = findPaymentModeName(value.paymentMode);
 
-          const date = new Date(value.date);
-
           const expenseDocumentData = {
-            date: date,
+            date: new Date(value.date),
             amount: Number(value.amount),
             reason: value.reason,
             paidToId: value.paidTo, // { id: value.paidTo, name: paidToRoleName[0].name },
@@ -239,16 +259,14 @@ export const addDailyExpense = createAsyncThunk<
             paymentModeName: paymentModeName[0].name,
             projectId: value.project,
             projectTitle: projectName[0].name,
-            miscellaneous:
-              value.miscellaneousPaidToName !== "null" &&
-              value.miscellaneousPaidToRole !== "null"
-                ? true
-                : false,
-            miscellaneuosPaidToId:
-              value.miscellaneousPaidToName !== "null" &&
-              value.miscellaneousPaidToRole !== "null"
-                ? uuidv4()
-                : "",
+            miscellaneous: state.addDailyExpense.miscellaneousInput,
+            // value.miscellaneousPaidToName !== "null" &&
+            // value.miscellaneousPaidToRole !== "null"
+            //   ? true
+            //   : false,
+            miscellaneuosPaidToId: state.addDailyExpense.miscellaneousInput
+              ?contributerExists.length==0? uuidv4():contributerExists[0].miscellaneousId
+              : "",
             miscellaneuosPaidToName: value.miscellaneousPaidToName,
             miscellaneousPaidToRole: value.miscellaneousPaidToRole,
             owner: user.uid,
@@ -259,49 +277,35 @@ export const addDailyExpense = createAsyncThunk<
             expenseDocumentData
           );
 
-          const projectDocRef = doc(db, "projects", value.project);
-
-          const projectDoc = await getDoc(projectDocRef);
-
-          const projectData = projectDoc.data();
-
-          const contrubutersLists = projectData ? projectData.contributers : [];
-
-          const contributerExists = contrubutersLists.some(
-            (contributer: any) => contributer.id === value.paidTo
-          );
-
-          if (expenseDocumentData.miscellaneous) {
-            const data = {
-              id: value.paidTo,
-              name: expenseDocumentData.miscellaneuosPaidToName as string,
-              miscellaneous: true,
-              miscellaneousRole:
-                expenseDocumentData.miscellaneousPaidToRole as string,
-              miscellaneousId: expenseDocumentData.miscellaneuosPaidToId,
-            };
-            await updateDoc(projectDocRef, {
-              expenses: arrayUnion(newExpense.id), // Add the new projectId to the 'projects' array
-              contributers: arrayUnion(data),
-            });
-          } else {
-            if (!contributerExists) {
-              const data: any = {
+          if (contributerExists.length == 0) {
+            let data;
+            if (expenseDocumentData.miscellaneous) {
+              data = {
+                id: value.paidTo,
+                name: expenseDocumentData.miscellaneuosPaidToName as string,
+                miscellaneous: true,
+                miscellaneousRole:
+                  expenseDocumentData.miscellaneousPaidToRole as string,
+                miscellaneousId: expenseDocumentData.miscellaneuosPaidToId,
+              };
+            } else {
+              data = {
                 id: value.paidTo,
                 name: paidToRoleName[0].name,
                 miscellaneous: false,
                 miscellaneousRole: null,
                 miscellaneousId: null,
               };
-              await updateDoc(projectDocRef, {
-                expenses: arrayUnion(newExpense.id), // Add the new projectId to the 'projects' array
-                contributers: arrayUnion(data),
-              });
-            } else {
-              await updateDoc(projectDocRef, {
-                expenses: arrayUnion(newExpense.id), // Add the new projectId to the 'projects' array
-              });
             }
+
+            await updateDoc(projectDocRef, {
+              expenses: arrayUnion(newExpense.id), // Add the new projectId to the 'projects' array
+              contributers: arrayUnion(data),
+            });
+          } else {
+            await updateDoc(projectDocRef, {
+              expenses: arrayUnion(newExpense.id), // Add the new projectId to the 'projects' array
+            });
           }
 
           const todayDate = new Date();
@@ -477,6 +481,8 @@ export const applyFilter = createAsyncThunk<
                 .join("-");
 
               eachDoc.date = formattedDate;
+
+              eachDoc.expenseId=doc.id;
 
               return eachDoc;
             });
