@@ -14,7 +14,7 @@ import { useLogin } from "@/Context/LoginProviderContext";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
 import { setDeleteConformationDrawerOpen } from "@/store/features/EditDeleteExpense";
 import EditDialog from "@/components/EditDialog/EditDialog";
-import { MobileAddExpenseDialog } from "@/components/AddExpenseDrawer/MobileAddExpenseDialog";
+// import { MobileAddExpenseDialog } from "@/components/AddExpenseDrawer/MobileAddExpenseDialog";
 
 const DailyExpense = () => {
   const dispatch = useAppDispatch();
