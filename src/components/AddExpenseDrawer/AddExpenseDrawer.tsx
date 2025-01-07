@@ -1,4 +1,5 @@
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
+import { Typography } from "@mui/material";
 import AddExpenseForm from "./AddExpenseForm";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
@@ -36,7 +37,7 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
           }
         }
       >
-        {/* <DrawerTitle>
+        <DrawerTitle>
           <Typography
             variant="h5"
             component="div" // Renders as a div instead of an h5
@@ -45,7 +46,7 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
           >
             Add Daily Expense
           </Typography>
-        </DrawerTitle> */}
+        </DrawerTitle>
 
         <AddExpenseForm
           dispatch={dispatch}
