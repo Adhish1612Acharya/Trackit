@@ -14,13 +14,68 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { Link } from "react-router-dom";
 import { auth } from "@/firebaseconfig";
 import { toast } from "react-toastify";
+import { useMediaQuery, useTheme } from "@mui/material";
+
 
 interface props {
   open: boolean;
   setOpen: (value: boolean) => void;
 }
 
+
+
 const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
+
+  const theme = useTheme();
+  const isDesktop = useMediaQuery( theme.breakpoints.up("md")); 
+
+  const LaplistItems=[
+    {
+      title: "Today's Expense",
+      icon: <CurrencyRupeeIcon />,
+      link: "/u/daily-expense",
+    },
+    {
+      title: "Your Projects",
+      icon: <AssignmentIcon />,
+      link: "/u/projects",
+    },
+    {
+      title: "Logout",
+      icon: <LogoutIcon />,
+      link: "",
+    },
+  ]
+  let mobileListItems=[
+    {
+      title: "Home",
+      icon: <HomeIcon />,
+      link: "/u/home",
+    },
+    {
+      title: "Add Expense",
+      icon: <AddIcon />,
+      link: "/u/daily-expense",
+    },
+    {
+      title: "Today's Expense",
+      icon: <CurrencyRupeeIcon />,
+      link: "/u/daily-expense",
+    },
+    {
+      title: "Your Projects",
+      icon: <AssignmentIcon />,
+      link: "/u/projects",
+    },
+    {
+      title: "Logout",
+      icon: <LogoutIcon />,
+      link: "",
+    },
+  ]
+  let listItems=isDesktop?LaplistItems:mobileListItems;
+
+  console.log(listItems);
   const list = () => (
     <Box
       sx={{ width: 250, height: "100%" }}
@@ -34,38 +89,11 @@ const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
       onKeyDown={() => setOpen(false)}
     >
       <List className="flex flex-col justify-evenly  h-full">
-        {[
-          {
-            title: "Home",
-            icon: <HomeIcon />,
-            link: "/u/home",
-          },
-          {
-            title: "Add Expense",
-            icon: <AddIcon />,
-            link: "/u/daily-expense",
-          },
-          {
-            title: "Today's Expense",
-            icon: <CurrencyRupeeIcon />,
-            link: "/u/daily-expense",
-          },
-          {
-            title: "Your Projects",
-            icon: <AssignmentIcon />,
-            link: "/u/projects",
-          },
-          {
-            title: "Logout",
-            icon: <LogoutIcon />,
-            link: "",
-          },
-        ].map((value, index) =>
+        {listItems.map((value, index) =>
           value.title === "Logout" ? (
             <ListItem
               key={index}
               disablePadding
-              sx={{ display: { md: "none", xs: "flex" } }}
             >
               <ListItemButton
                 onClick={async () => {
@@ -89,7 +117,7 @@ const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
             >
               <ListItem
                 disablePadding
-                sx={{ display: { md: "none", xs: "flex" } }}
+               
               >
                 <ListItemButton>
                   <ListItemIcon style={{ color: "black" }}>
@@ -101,7 +129,7 @@ const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
             </Link>
           )
         )}
-        {[
+        {/* {[
           {
             title: "Today's Expense",
             icon: <CurrencyRupeeIcon />,
@@ -157,8 +185,8 @@ const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
               </ListItemButton>
             </ListItem>
           )
-        )}
-      </List>
+        )}*/}
+      </List> 
     </Box>
   );
 

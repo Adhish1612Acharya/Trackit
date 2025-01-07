@@ -24,7 +24,7 @@ const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
           <Button
             variant={"outline"}
             className={cn(
-              "w-[240px] pl-3 text-left font-normal",
+              " pl-3 text-left font-normal",
               !field.value && "text-muted-foreground"
             )}
           >
@@ -53,6 +53,7 @@ const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
         <Calendar
           className="calendar bg-white text-black border-gray-300"
           mode="single"
+          style={{zIndex:"1100"}}
           selected={field.value}
           onSelect={field.onChange}
           disabled={(date) =>

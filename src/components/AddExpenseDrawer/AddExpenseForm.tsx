@@ -82,7 +82,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   }
 
   const onSubmit = async (formData: z.infer<typeof addExpenseFormSchema>) => {
-    if (editForm) { 
+    if (editForm) {
       const editedFormData: editedFormValueType = {
         date: formData.date,
         amount: Number(formData.amount),
@@ -93,19 +93,23 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
         miscellaneousPaidToRole: formData.miscellaneousPaidToRole
           ? formData.miscellaneousPaidToRole
           : "null",
-        miscellaneuosPaidToId: editForm ? expense?expense.miscellaneuosPaidToId : "":"",
+        miscellaneuosPaidToId: editForm
+          ? expense
+            ? expense.miscellaneuosPaidToId
+            : ""
+          : "",
         miscellaneuosPaidToName: formData.miscellaneousPaidToName
           ? formData.miscellaneousPaidToName
           : "null",
       };
 
       await dispatch(editExpenseDetails({ editFormValue: editedFormData }));
-      if(window.location.href==="/u/daily-expense"){
+      if (window.location.href === "/u/daily-expense") {
         await dispatch(getUserDailyExpense());
-      }else if (window.location.pathname.startsWith("/u/projects/")) {
-        await dispatch(getUserProjectExpense(expense?expense.projectId:""));
+      } else if (window.location.pathname.startsWith("/u/projects/")) {
+        await dispatch(getUserProjectExpense(expense ? expense.projectId : ""));
       }
-     
+
       dispatch(
         setEditDrawerOpen({ id: "", open: false, dailyExpenseOrNot: false })
       );
@@ -132,7 +136,10 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className={editForm?"p-2":""}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className={editForm ? "p-2" : ""}
+        >
           {/* Row for Date and Amount */}
           <div
             style={{
@@ -153,9 +160,8 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     flex: 1,
                     marginLeft: `${editForm ? "" : "1rem"}`,
                     maxWidth: "100%",
-                
+                    
                   }}
-
                   className={editForm ? "my-2 mx-2" : ""}
                 >
                   {" "}
@@ -199,7 +205,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
               <FormItem
                 className="mx-2 my-2"
                 // className={editForm ? "my-2 mx-2" : ""}
-                style={{ maxWidth: "100%" }}
+                style={{ maxWidth: "100%"}}
               >
                 <FormLabel>Reason</FormLabel>
                 <FormControl>
@@ -212,6 +218,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
               </FormItem>
             )}
           />
+
 
           {/* Miscellaneous Fields */}
           {editForm
@@ -271,7 +278,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     name="miscellaneousPaidToName"
                     render={({ field }) => (
                       <FormItem style={{ flex: 1, marginLeft: "1rem" }}>
-                        <FormLabel>Miscellaneous Paid To Name</FormLabel>
+                        <FormLabel>Miscellaneous name</FormLabel>
                         <FormControl>
                           <Input placeholder="Enter the name" {...field} />
                         </FormControl>
@@ -285,7 +292,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     name="miscellaneousPaidToRole"
                     render={({ field }) => (
                       <FormItem style={{ flex: 1, marginRight: "1rem" }}>
-                        <FormLabel>Miscellaneous Paid To Role</FormLabel>
+                        <FormLabel>Miscellaneous role</FormLabel>
                         <FormControl>
                           <Input placeholder="Enter the role" {...field} />
                         </FormControl>
@@ -301,7 +308,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
             style={{
               display: "flex",
               gap: "1rem",
-              justifyContent: "start"
+              justifyContent: "start",
             }}
             className={editForm ? "mx-2 my-2" : ""}
           >
@@ -448,9 +455,10 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
               name="project"
               render={({ field }) => (
                 <FormItem
-                  style={{ flex: 1,
-                    //  marginLeft: "1rem" 
-                    }}
+                  style={{
+                    flex: 1,
+                    //  marginLeft: "1rem"
+                  }}
                   className={editForm ? "my-2 mx-2" : ""}
                 >
                   <FormLabel>Project</FormLabel>
@@ -474,7 +482,9 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                 variant="outline"
                 size="icon"
                 type="button"
-                onClick={() => dispatch(setOpenAddProjectDrawer(true))}
+                onClick={() => {
+                  dispatch(setOpenAddProjectDrawer(true));
+                }}
                 style={{
                   marginRight: "84%",
                   marginLeft: "1rem",

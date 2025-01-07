@@ -18,25 +18,13 @@ interface addProjectDrawerProps {
 }
 
 const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch }) => {
-  // const form = useForm<z.infer<typeof addProjectFormSchema>>({
-  //   resolver: zodResolver(addProjectFormSchema),
-  //   defaultValues: {
-  //     title: "",
-  //     description: "",
-  //     budget: undefined,
-  //   },
-  // });
-
-  // const handleFormSubmit = (
-  //   formValue: z.infer<typeof addProjectFormSchema>
-  // ) => {
-  //   dispatch(addProject(formValue)).then(() => form.reset());
-  // };
 
   return (
     <Dialog
       open={open}
-      onOpenChange={() => dispatch(setOpenAddProjectDrawer(false))}
+      onOpenChange={() => {
+        dispatch(setOpenAddProjectDrawer(false));
+      }}
     >
       <DialogContent className="max-w-md mx-auto p-6">
         <DialogHeader>

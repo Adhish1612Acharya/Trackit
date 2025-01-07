@@ -9,6 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
+import CloseIcon from '@mui/icons-material/Close';
 
 interface EditDialogProps {
   editDialogOpen: boolean;
@@ -48,7 +49,11 @@ const EditDialog: FC<EditDialogProps> = ({
       }
       aria-labelledby="responsive-dialog-title"
     >
-      <DialogTitle id="responsive-dialog-title" style={{marginBottom:"0rem"}}>{"Edit Expense"}</DialogTitle>
+      <DialogTitle id="responsive-dialog-title" style={{marginBottom:"0rem", display:"flex" , justifyContent:"space-between"}}>{"Edit Expense"} <CloseIcon style={{cursor:"pointer"}} onClick={()=>dispatch( setEditDrawerOpen({
+            id: "",
+            open: false,
+            dailyExpenseOrNot: false,
+          }))}/></DialogTitle>
       {/* <DialogContent> */}
       {/* <DialogContentText> */}
       <div className="grid gap-4 py-4">

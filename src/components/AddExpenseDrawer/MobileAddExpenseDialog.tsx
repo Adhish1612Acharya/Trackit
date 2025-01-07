@@ -51,7 +51,7 @@ export const MobileAddExpenseDialog: React.FC<addExpenseDrawerProps> = ({ dispat
         <IconButton
           edge="start"
           color="inherit"
-    //    onClick={() => dispatch(setOpenAddExpenseDrawer(false))}
+       onClick={() => dispatch(setOpenAddExpenseDrawer(false))}
           aria-label="close"
         >
           <CloseIcon />

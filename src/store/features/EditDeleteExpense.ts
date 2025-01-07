@@ -460,6 +460,7 @@ const editDeleteExpenseSlice = createSlice({
 
     builder.addCase(editExpenseDetails.fulfilled, (state, action) => {
       state.expenseInfo = action.payload.editedExpense;
+      toast.success("Expense Edited successfully");
       // state.editFuncLoad = false;
       // state.editDrawerOpen = false;
     });

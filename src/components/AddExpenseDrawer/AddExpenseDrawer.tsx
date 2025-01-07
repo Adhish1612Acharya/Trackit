@@ -31,13 +31,13 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
         aria-labelledby="add-daily-expense-title"
         style={
           {
-            // Adjust as needed
-            // overflowY: "auto", // Enable scrolling
-            // Optional, for better spacing
+            // overflowY: "auto", // Enable vertical scrolling
+           
+          padding:"16px"
           }
         }
       >
-        <DrawerTitle>
+        {/* <DrawerTitle>
           <Typography
             variant="h5"
             component="div" // Renders as a div instead of an h5
@@ -46,7 +46,7 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
           >
             Add Daily Expense
           </Typography>
-        </DrawerTitle>
+        </DrawerTitle> */}
 
         <AddExpenseForm
           dispatch={dispatch}

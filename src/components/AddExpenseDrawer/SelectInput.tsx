@@ -60,12 +60,15 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
           </SelectTrigger>
           <SelectContent
             style={{
+             overflowY:"scroll",
               zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
             }}
-            side={title === "Payment Mode" ? "bottom" : "right"}
+            
+            side={"top"}
+            
           >
-            <SelectGroup>
-              <SelectLabel>Paid To</SelectLabel>
+            <SelectGroup >
+              <SelectLabel>{title}</SelectLabel>
               {options.map((option) => {
                 return (
                   <SelectItem key={option.id} value={String(option.id)}>
