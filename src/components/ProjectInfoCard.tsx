@@ -24,51 +24,51 @@ const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
   navigate,
 }) => {
   return (
-    <Card className="w-full max-w-4xl mx-auto my-4 transition-transform transform hover:scale-[1.02] shadow-lg rounded-2xl overflow-hidden bg-gradient-to-r from-blue-500 to-blue-700 text-white flex flex-col md:flex-row">
-      {/* Image Section */}
-      <CardMedia
-        className="w-full md:w-1/2 h-64 md:h-auto bg-cover bg-center"
-        image="https://clipart-library.com/data_images/220852.jpg"
-        title="Project"
-      />
-      {/* Content Section */}
-      <div className="flex flex-col justify-between p-6 md:w-1/2">
-        <CardContent className="flex-grow">
-          <div className="flex items-center justify-between">
-            <Typography
-              gutterBottom
-              variant="h5"
-              component="div"
-              className="font-bold text-black"
-            >
-              {title}
-            </Typography>
-            {/* Budget Badge */}
-            <div className="bg-white text-blue-700 text-sm font-semibold px-3 py-1 rounded-full shadow-md">
-              <CurrencyRupeeIcon />
-              {budget}
-            </div>
-          </div>
+    <Card className="w-full max-w-4xl mx-auto my-6 transition-transform transform hover:scale-105 shadow-lg rounded-xl overflow-hidden bg-white flex flex-col md:flex-row">
+    {/* Image Section */}
+    <CardMedia
+      className="w-full md:w-1/2 h-64 md:h-auto bg-cover bg-center"
+      image="https://clipart-library.com/data_images/220852.jpg"
+      title="Project"
+    />
+    {/* Content Section */}
+    <div className="flex flex-col justify-between p-6 md:w-1/2 bg-gradient-to-b from-blue-50 to-white">
+      <CardContent className="flex-grow">
+        <div className="flex items-center justify-between">
           <Typography
-            variant="body2"
-            className="text-blue-200 mt-4 leading-relaxed"
+            variant="h5"
+            component="h2"
+            className="font-bold text-gray-800"
           >
-            {description}
+            {title}
           </Typography>
-        </CardContent>
-        {/* Actions Section */}
-        <CardActions className="flex justify-end mt-4">
-          <Button
-            variant="contained"
-            size="small"
-            className="bg-white text-blue-700 font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-gray-200 transition"
-            onClick={() => navigate(`/u/projects/${id}`)}
-          >
-            View Expense
-          </Button>
-        </CardActions>
-      </div>
-    </Card>
+          {/* Budget Badge */}
+          <div className="bg-blue-100 text-blue-700 text-sm font-medium px-4 py-2 rounded-full flex items-center gap-1 shadow">
+            <CurrencyRupeeIcon fontSize="small" />
+            {budget}
+          </div>
+        </div>
+        <Typography
+          variant="body2"
+          className="text-gray-600 mt-4 leading-relaxed"
+        >
+          {description}
+        </Typography>
+      </CardContent>
+      {/* Actions Section */}
+      <CardActions className="flex justify-end mt-4">
+        <Button
+          variant="contained"
+          size="medium"
+          className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition"
+          onClick={() => navigate(`/u/projects/${id}`)}
+        >
+          View Expense
+        </Button>
+      </CardActions>
+    </div>
+  </Card>
+  
   );
 };
 

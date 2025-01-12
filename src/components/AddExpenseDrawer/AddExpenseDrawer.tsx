@@ -1,63 +1,67 @@
-import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
-import { Typography } from "@mui/material";
+import { DialogContent } from "@mui/material";
 import AddExpenseForm from "./AddExpenseForm";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
 import { FC } from "react";
-import AddProjectDrawer from "./AddProjectDrawer";
-import { projectOptionsType } from "@/store/features/DailyExpense";
+import {
+  projectOptionsType,
+  setOpenAddExpenseDrawer,
+} from "@/store/features/DailyExpense";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import CloseIcon from "@mui/icons-material/Close";
 
 export interface addExpenseDrawerProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   openDrawer: boolean;
-  openAddProjectDrawer: boolean;
   projectOptions: projectOptionsType[];
+  loading: boolean;
+  miscellaneousInput: boolean;
 }
 
 const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
   dispatch,
   openDrawer,
-  openAddProjectDrawer,
+  loading,
   projectOptions,
-  // submit,
+  miscellaneousInput,
 }) => {
-  return (
-    <Drawer
-      open={openDrawer}
-      
-      // onOpenChange={() => dispatch(setOpenAddExpenseDrawer(false))}
-    >
-      <DrawerContent
-        aria-labelledby="add-daily-expense-title"
-        style={
-          {
-            // overflowY: "auto", // Enable vertical scrolling
-           
-          padding:"16px"
-          }
-        }
-      >
-        <DrawerTitle>
-          <Typography
-            variant="h5"
-            component="div" // Renders as a div instead of an h5
-            align="center"
-            sx={{ mb: 2 }}
-          >
-            Add Daily Expense
-          </Typography>
-        </DrawerTitle>
+  const theme = useTheme();
 
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  return (
+    <Dialog
+      fullScreen={fullScreen}
+      style={{ height: "max-content", maxHeight: "100vh", overflowY: "auto" }}
+      open={openDrawer}
+      onClose={() => () => dispatch(setOpenAddExpenseDrawer(false))}
+      aria-labelledby="responsive-dialog-title"
+    >
+      <DialogTitle
+        id="responsive-dialog-title"
+        style={{
+          marginBottom: "0rem",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        {"Add Expense"}{" "}
+        <CloseIcon
+          style={{ cursor: "pointer" }}
+          onClick={() => dispatch(setOpenAddExpenseDrawer(false))}
+        />
+      </DialogTitle>
+      <DialogContent>
         <AddExpenseForm
           dispatch={dispatch}
           projectOptions={projectOptions}
+          loading={loading}
+          miscellaneousInput={miscellaneousInput}
         />
-
-        <AddProjectDrawer open={openAddProjectDrawer} dispatch={dispatch} />
-
-        {/* </motion.div> */}
-      </DrawerContent>
-    </Drawer>
+      </DialogContent>
+    </Dialog>
   );
 };
 

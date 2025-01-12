@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { RootState } from "../store";
 import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
+import { v4 as uuidv4 } from "uuid";
 
 interface initialStateType {
   editDrawerOpen: boolean;
@@ -49,6 +50,7 @@ const initialState: initialStateType = {
     miscellaneousPaidToRole: "",
     miscellaneuosPaidToId: "",
     miscellaneuosPaidToName: "",
+    billImage: "",
   },
   expenseId: "",
   dailyExpense: false,
@@ -82,6 +84,15 @@ export interface editedFormValueType {
   miscellaneousPaidToRole: string;
   miscellaneuosPaidToId: string;
   miscellaneuosPaidToName: string;
+  billImage: Promise<string> | string;
+}
+
+export interface contributer {
+  id: string;
+  miscellaneous: boolean;
+  miscellaneousId: string;
+  miscellaneousRole: string;
+  name: string;
 }
 
 export const getExpenseDetails = createAsyncThunk<
@@ -154,7 +165,7 @@ export const editExpenseDetails = createAsyncThunk<
         try {
           const state = thunkAPI.getState() as RootState;
 
-          let contrubutersLists=[];
+          let contrubutersLists = [];
 
           let contributerData;
 
@@ -166,8 +177,6 @@ export const editExpenseDetails = createAsyncThunk<
           const normalizeString = (str: string): string => {
             return str.toLowerCase().replace(/\s+/g, "");
           };
-
-      
 
           const findPaidToRoleName = (id: string) => {
             return constructionRoles.filter((role) => {
@@ -204,23 +213,35 @@ export const editExpenseDetails = createAsyncThunk<
             });
           };
 
+          const checkMiscellaneousSame = () => {
+            return (
+              normalizeString(
+                state.editDeleteExpense.expenseInfo.miscellaneuosPaidToName
+              ) ===
+                normalizeString(
+                  editFormValue.miscellaneuosPaidToName as string
+                ) &&
+              normalizeString(
+                state.editDeleteExpense.expenseInfo.miscellaneousPaidToRole
+              ) ===
+                normalizeString(editFormValue.miscellaneousPaidToRole as string)
+            );
+          };
+
           //
 
           // ----------------------Checking Contributer already exists----------------------------//
 
+          const projectDocRef = doc(db, "projects", editFormValue.projectId);
 
-            const projectDocRef = doc(db, "projects", editFormValue.projectId);
+          const projectDoc = await getDoc(projectDocRef);
 
-            const projectDoc = await getDoc(projectDocRef);
+          const projectData = projectDoc.data();
 
-            const projectData = projectDoc.data();
+          contrubutersLists = projectData ? projectData.contributers : [];
 
-            contrubutersLists = projectData ? projectData.contributers : [];
-            
-         
-
-          const contributerExists = contrubutersLists.filter(
-            (contributer: any) =>
+          const contributerExists: contributer[] = contrubutersLists.filter(
+            (contributer: contributer) =>
               editFormValue.paidToId != "51"
                 ? contributer.id === editFormValue.paidToId
                 : normalizeString(contributer.name) ===
@@ -233,7 +254,7 @@ export const editExpenseDetails = createAsyncThunk<
                     )
           );
 
-          if(contributerExists.length==0){
+          if (contributerExists.length == 0) {
             if (state.editDeleteExpense.miscellaneuosInput) {
               contributerData = {
                 id: editFormValue.paidToId,
@@ -241,23 +262,20 @@ export const editExpenseDetails = createAsyncThunk<
                 miscellaneous: true,
                 miscellaneousRole:
                   editFormValue.miscellaneousPaidToRole as string,
-                miscellaneousId: editFormValue.miscellaneuosPaidToId,
+                miscellaneousId: uuidv4(),
               };
             } else {
               contributerData = {
                 id: editFormValue.paidToId,
                 name: findPaidToRoleName(editFormValue.paidToId)[0].name,
                 miscellaneous: false,
-                miscellaneousRole: null,
-                miscellaneousId: null,
+                miscellaneousRole: "",
+                miscellaneousId: "",
               };
-
             }
           }
 
           // -------------------***Checking Contributer already exists***-------------------------//
-
-       
 
           const updatedFormValue: any = {
             date: new Date(editFormValue.date),
@@ -277,14 +295,22 @@ export const editExpenseDetails = createAsyncThunk<
             miscellaneous: state.editDeleteExpense.miscellaneuosInput,
             miscellaneousPaidToRole: state.editDeleteExpense.miscellaneuosInput
               ? editFormValue.miscellaneousPaidToRole
-              : "null",
+              : "",
             miscellaneuosPaidToId: state.editDeleteExpense.miscellaneuosInput
-              ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+              ? (checkMiscellaneousSame() && contributerExists.length > 0) ||
+                (!checkMiscellaneousSame() && contributerExists.length > 0)
+                ? contributerExists[0].miscellaneousId
+                : // state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+                checkMiscellaneousSame() && contributerExists.length == 0
+                ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+                : uuidv4()
               : "",
             miscellaneuosPaidToName: state.editDeleteExpense.miscellaneuosInput
               ? editFormValue.miscellaneuosPaidToName
-              : "null",
+              : "",
+            billImage: editFormValue.billImage?editFormValue.billImage:"",
           };
+
 
           const expenseDocRef = doc(
             db,
@@ -318,32 +344,32 @@ export const editExpenseDetails = createAsyncThunk<
               expenses: arrayRemove(state.editDeleteExpense.expenseId),
             });
 
-               // Update data for the second document
-            if(contributerExists.length===0){
-            batch.update(expenseDocRef2, {
-              expenses: arrayUnion(state.editDeleteExpense.expenseId),
-              contributers:arrayUnion(contributerData)
-            });
-            }else{
+            // Update data for the second document
+            if (contributerExists.length === 0) {
+              batch.update(expenseDocRef2, {
+                expenses: arrayUnion(state.editDeleteExpense.expenseId),
+                contributers: arrayUnion(contributerData),
+              });
+            } else {
               batch.update(expenseDocRef2, {
                 expenses: arrayUnion(state.editDeleteExpense.expenseId),
               });
             }
 
-
-
             // Commit the batch
             await batch.commit();
-          }else{
-            
-            if(contributerExists.length===0){
-              const projectDocRef = doc(db, "projects",editFormValue.projectId);
+          } else {
+            if (contributerExists.length === 0) {
+              const projectDocRef = doc(
+                db,
+                "projects",
+                editFormValue.projectId
+              );
 
               await updateDoc(projectDocRef, {
                 contributers: arrayUnion(contributerData),
               });
             }
-          
           }
 
           resolve({
@@ -429,9 +455,12 @@ const editDeleteExpenseSlice = createSlice({
     setEditExpenseMiscellaneousInput: (state, action) => {
       state.miscellaneuosInput = action.payload;
     },
-    setEditFuncLoad: (state, action) => {
+    setEditFuncLoad: (state, action:PayloadAction<boolean>) => {
       state.editFuncLoad = action.payload;
     },
+    setExpenseBillImage:(state,action:PayloadAction<string>)=>{
+    state.expenseInfo.billImage=action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getExpenseDetails.pending, (state, _action) => {
@@ -497,4 +526,5 @@ export const {
   setDeleteConformationDrawerOpen,
   setEditExpenseMiscellaneousInput,
   setEditFuncLoad,
+  setExpenseBillImage
 } = editDeleteExpenseSlice.actions;

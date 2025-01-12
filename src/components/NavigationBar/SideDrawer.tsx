@@ -74,8 +74,6 @@ const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
     },
   ]
   let listItems=isDesktop?LaplistItems:mobileListItems;
-
-  console.log(listItems);
   const list = () => (
     <Box
       sx={{ width: 250, height: "100%" }}

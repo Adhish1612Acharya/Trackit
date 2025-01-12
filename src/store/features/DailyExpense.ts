@@ -33,6 +33,7 @@ export interface formValueType {
   project: string;
   miscellaneousPaidToName?: string;
   miscellaneousPaidToRole?: string;
+  billImage:Promise<string>|string;
 }
 
 export interface expenseType {
@@ -50,6 +51,7 @@ export interface expenseType {
   miscellaneousPaidToRole: string;
   miscellaneuosPaidToId: string;
   miscellaneuosPaidToName: string;
+  billImage:string;
 }
 
 export interface filterValueType {
@@ -267,9 +269,10 @@ export const addDailyExpense = createAsyncThunk<
             miscellaneuosPaidToId: state.addDailyExpense.miscellaneousInput
               ?contributerExists.length==0? uuidv4():contributerExists[0].miscellaneousId
               : "",
-            miscellaneuosPaidToName: value.miscellaneousPaidToName,
-            miscellaneousPaidToRole: value.miscellaneousPaidToRole,
+            miscellaneuosPaidToName: state.addDailyExpense.miscellaneousInput? value.miscellaneousPaidToName:"",
+            miscellaneousPaidToRole: state.addDailyExpense.miscellaneousInput? value.miscellaneousPaidToRole:"",
             owner: user.uid,
+            billImage:value.billImage?value.billImage:""
           };
 
           const newExpense = await addDoc(
@@ -552,6 +555,9 @@ const dailyExpenseSlice = createSlice({
         0
       );
     },
+    setAddExpenseLoad:(state,action:PayloadAction<boolean>)=>{
+        state.addExpenseBtnLoad=action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getUserDailyExpense.pending, (state, _action) => {
@@ -651,4 +657,5 @@ export const {
   setOpenFilterDrawer,
   setEditedExpenseInfo,
   setDeletedExpenseInfo,
+  setAddExpenseLoad
 } = dailyExpenseSlice.actions;

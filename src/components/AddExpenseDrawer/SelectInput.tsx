@@ -55,7 +55,7 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
             }
           }}
         >
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder={`Select ${title}`} />
           </SelectTrigger>
           <SelectContent
@@ -64,7 +64,7 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
               zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
             }}
             
-            side={"top"}
+            side={"bottom"}
             
           >
             <SelectGroup >

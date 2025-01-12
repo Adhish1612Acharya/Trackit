@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/dialog";
 import { FC } from "react";
 import {
+  setOpenAddExpenseDrawer,
   setOpenAddProjectDrawer,
 } from "@/store/features/DailyExpense";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
@@ -23,6 +24,7 @@ const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch }) => {
     <Dialog
       open={open}
       onOpenChange={() => {
+         dispatch(setOpenAddExpenseDrawer(true))
         dispatch(setOpenAddProjectDrawer(false));
       }}
     >

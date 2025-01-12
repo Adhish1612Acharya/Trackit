@@ -1,4 +1,3 @@
-// DailyExpense.js
 import { useEffect } from "react";
 import DataTable from "@/components/DataTable/DataTable";
 import { Fab, Container } from "@mui/material";
@@ -14,7 +13,7 @@ import { useLogin } from "@/Context/LoginProviderContext";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
 import { setDeleteConformationDrawerOpen } from "@/store/features/EditDeleteExpense";
 import EditDialog from "@/components/EditDialog/EditDialog";
-// import { MobileAddExpenseDialog } from "@/components/AddExpenseDrawer/MobileAddExpenseDialog";
+import AddProjectDrawer from "@/components/AddExpenseDrawer/AddProjectDrawer";
 
 const DailyExpense = () => {
   const dispatch = useAppDispatch();
@@ -61,7 +60,6 @@ const DailyExpense = () => {
     (state) => state.editDeleteExpense.expenseId
   );
 
-  // Edit Dialog States
   const editDialogOpen = useAppSelector(
     (state) => state.editDeleteExpense.editDrawerOpen
   );
@@ -74,13 +72,21 @@ const DailyExpense = () => {
     (state) => state.editDeleteExpense.currrentProject
   );
 
-  // const projectOptions = useAppSelector(
-  //   (state) => state.editDeleteExpense.editProjectOptions
-  // );
+  const addExpenseLoading=useAppSelector(
+    (state) => state.addDailyExpense.addExpenseBtnLoad
+  ) 
+
+  const editExpenseLoading=useAppSelector(state=>state.editDeleteExpense.editFuncLoad);
 
   const editInfoLoad = useAppSelector(
     (state) => state.editDeleteExpense.editInfoLoad
   );
+
+  const editDeleteExpenseMiscellaneousInput=useAppSelector(
+    (state) => state.editDeleteExpense.miscellaneuosInput
+  )
+
+  const miscellaneousInput=useAppSelector(state=>state.addDailyExpense.miscellaneousInput);
 
   useEffect(() => {
     dispatch(getUserDailyExpense());
@@ -115,19 +121,6 @@ const DailyExpense = () => {
       >
         <AddIcon />
       </Fab>
-      <AddExpenseDrawer
-        openDrawer={openAddExpenseDrawer}
-        openAddProjectDrawer={openAddProjectDrawer}
-        dispatch={dispatch}
-        projectOptions={projectOptions}
-        // submit={submit}
-      />
-      {/* <MobileAddExpenseDialog
-      openDrawer={openAddExpenseDrawer}
-      openAddProjectDrawer={openAddProjectDrawer}
-      dispatch={dispatch}
-      projectOptions={projectOptions}
-      /> */}
 
       <FilterDrawer
         open={filterDrawerOpen}
@@ -150,9 +143,20 @@ const DailyExpense = () => {
         expense={expense}
         editExpenseCurrentProject={editExpenseCurrentProject}
         projectOptions={projectOptions}
-        editInfoLoad={editInfoLoad}
-        // isDailyExpense={false}
+        editInfoLoad={editInfoLoad }
+        editFuncLoading={editExpenseLoading}
+      miscellaneousInput={editDeleteExpenseMiscellaneousInput}
       />
+
+<AddExpenseDrawer
+        openDrawer={openAddExpenseDrawer}
+        dispatch={dispatch}
+        projectOptions={projectOptions}
+        loading={addExpenseLoading}
+        miscellaneousInput={miscellaneousInput}
+      />
+
+<AddProjectDrawer open={openAddProjectDrawer} dispatch={dispatch} />
     </Container>
   );
 };

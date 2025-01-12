@@ -10,6 +10,7 @@ import {
   Tooltip,
   Typography,
   CircularProgress,
+  Button,
 } from "@mui/material";
 import ReasonField from "./ReasonField";
 import { expenseType } from "@/store/features/DailyExpense";
@@ -22,6 +23,7 @@ import {
   setDeleteConformationDrawerOpen,
   setEditDrawerOpen,
 } from "@/store/features/EditDeleteExpense";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 interface tableComponentProps {
   expense: expenseType[] | [];
@@ -57,6 +59,7 @@ const TableComponent: FC<tableComponentProps> = ({
               "Paid To",
               "Payment Mode",
               "Reason",
+              "Bill",
               "Project",
               "Options",
             ].map((header) => (
@@ -128,6 +131,22 @@ const TableComponent: FC<tableComponentProps> = ({
                 <TableCell>{eachExpense.paymentModeName}</TableCell>
                 <TableCell>
                   <ReasonField reason={eachExpense.reason} />
+                </TableCell>
+                <TableCell>
+                  {eachExpense.billImage && eachExpense.billImage!==""? <Button
+                      id="fileInput"
+                      component="label"
+                      role={undefined}
+                      variant="contained"
+                      tabIndex={-1}
+                      startIcon={<PictureAsPdfIcon />}
+                      className="h-9 w-full"
+                      onClick={() => {window.open(eachExpense.billImage, "_blank")}}
+                    >
+                      View
+                    </Button>:
+                    <p>No Bill Uploaded</p>}
+               
                 </TableCell>
                 <TableCell>{eachExpense.projectTitle}</TableCell>
                 <TableCell>

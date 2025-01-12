@@ -21,6 +21,7 @@ import {
   setDeleteConformationDrawerOpen,
   setEditDrawerOpen,
 } from "@/store/features/EditDeleteExpense";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 
 interface expenseAccordianProps {
   index: number;
@@ -94,7 +95,7 @@ const ExpenseAccordian: FC<expenseAccordianProps> = ({
               color="text.secondary"
               fontWeight="bold"
             >
-              Paid To:
+              Paid To :
             </Typography>
             {eachExpense.miscellaneous ? (
               <Tooltip title={eachExpense.miscellaneuosPaidToName} arrow>
@@ -121,7 +122,7 @@ const ExpenseAccordian: FC<expenseAccordianProps> = ({
               color="text.secondary"
               fontWeight="bold"
             >
-              Payment Mode:
+              Payment Mode :
             </Typography>
             <Typography variant="body2" color="text.primary">
               {eachExpense.paymentModeName}
@@ -134,10 +135,35 @@ const ExpenseAccordian: FC<expenseAccordianProps> = ({
               color="text.secondary"
               fontWeight="bold"
             >
-              Reason:
+              Reason :
             </Typography>
             <ReasonField reason={eachExpense.reason} />
           </Box>
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              fontWeight="bold"
+            >
+                Bill : 
+            </Typography>
+            {eachExpense.billImage && eachExpense.billImage!==""? <Button
+                      id="fileInput"
+                      component="label"
+                      role={undefined}
+                      variant="contained"
+                      tabIndex={-1}
+                      startIcon={<PictureAsPdfIcon />}
+                      className="h-9 w-1/2"
+                      onClick={() => {window.open(eachExpense.billImage, "_blank")}}
+                    >
+                      View
+                    </Button>:
+                    <p>No Bill Uploaded</p>}
+            </Box>
+
+          
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <Typography

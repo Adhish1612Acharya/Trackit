@@ -70,6 +70,12 @@ const ProjectExpense = () => {
     (state) => state.editDeleteExpense.editInfoLoad
   );
 
+  const editExpenseLoading=useAppSelector(state=>state.editDeleteExpense.editFuncLoad);
+
+  const editDeleteExpenseMiscellaneousInput=useAppSelector(
+    (state) => state.editDeleteExpense.miscellaneuosInput
+  )
+
   useEffect(() => {
     dispatch(getUserProjectExpense(id as string));
   }, [dispatch, id]);
@@ -119,7 +125,8 @@ const ProjectExpense = () => {
         editExpenseCurrentProject={editExpenseCurrentProject}
         projectOptions={projectOptions}
         editInfoLoad={editInfoLoad}
-        // isDailyExpense={false}
+        editFuncLoading={editExpenseLoading}
+      miscellaneousInput={editDeleteExpenseMiscellaneousInput}
       />
     </Container>
   );

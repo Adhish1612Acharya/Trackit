@@ -4,7 +4,7 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { FC } from "react";
 import AddExpenseForm from "../AddExpenseDrawer/AddExpenseForm";
 import { setEditDrawerOpen } from "@/store/features/EditDeleteExpense";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, DialogContent } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -18,7 +18,8 @@ interface EditDialogProps {
   editExpenseCurrentProject: { id: string; name: string };
   projectOptions: projectOptionsType[];
   editInfoLoad: boolean;
-  // isDailyExpense: boolean;
+  editFuncLoading: boolean;
+  miscellaneousInput:boolean;
 }
 
 const EditDialog: FC<EditDialogProps> = ({
@@ -28,7 +29,8 @@ const EditDialog: FC<EditDialogProps> = ({
   editExpenseCurrentProject,
   projectOptions,
   editInfoLoad,
-  // isDailyExpense,
+  editFuncLoading,
+  miscellaneousInput
 }) => {
   const theme = useTheme();
 
@@ -54,8 +56,7 @@ const EditDialog: FC<EditDialogProps> = ({
             open: false,
             dailyExpenseOrNot: false,
           }))}/></DialogTitle>
-      {/* <DialogContent> */}
-      {/* <DialogContentText> */}
+       <DialogContent>
       <div className="grid gap-4 py-4">
         {editInfoLoad ? (
           <CircularProgress />
@@ -66,27 +67,12 @@ const EditDialog: FC<EditDialogProps> = ({
             expense={expense}
             editForm={true}
             editExpenseCurrentProject={editExpenseCurrentProject}
+            loading={editFuncLoading}
+            miscellaneousInput={miscellaneousInput}
           />
         )}
       </div>
-      {/* </DialogContentText> */}
-      {/* </DialogContent> */}
-      {/* <DialogActions>
-        <Button
-          onClick={() =>
-            dispatch(
-              setEditDrawerOpen({
-                id: "",
-                open: false,
-                dailyExpenseOrNot: false,
-              })
-            )
-          }
-          autoFocus
-        >
-          Close
-        </Button>
-      </DialogActions> */}
+      </DialogContent>
     </Dialog>
   );
 };
