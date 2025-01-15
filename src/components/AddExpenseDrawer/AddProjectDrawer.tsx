@@ -7,26 +7,29 @@ import {
 import { FC } from "react";
 import {
   setOpenAddExpenseDrawer,
-  setOpenAddProjectDrawer,
+  setOpenAddProjectDrawer as dailyExpenseAddProjectDrawer,
 } from "@/store/features/DailyExpense";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
 import AddProjectForm from "./AddProjectForm";
+import { setOpenAddProjectDrawer } from "@/store/features/GetProjects";
 
 interface addProjectDrawerProps {
   open: boolean;
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   addProjectBtnLoad:boolean;
+  isDailyExpensePage:boolean;
 }
 
-const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch ,addProjectBtnLoad}) => {
+const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch ,addProjectBtnLoad,isDailyExpensePage}) => {
 
   return (
     <Dialog
       open={open}
       onOpenChange={() => {
-         dispatch(setOpenAddExpenseDrawer(true))
-        dispatch(setOpenAddProjectDrawer(false));
+        isDailyExpensePage? ()=>{dispatch(setOpenAddExpenseDrawer(true));
+          dispatch(dailyExpenseAddProjectDrawer(false));}
+        :dispatch(setOpenAddProjectDrawer(false))
       }}
     >
       <DialogContent className="max-w-md mx-auto p-6">
@@ -34,7 +37,7 @@ const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch ,addProjec
           <DialogTitle>Add Project</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <AddProjectForm dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} />
+          <AddProjectForm dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} isDailyExpensePage={isDailyExpensePage}/>
         </div>
       </DialogContent>
     </Dialog>

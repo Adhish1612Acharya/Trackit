@@ -9,7 +9,7 @@ import {
 import addProjectFormSchema from "@/validations/forms/AddProjectForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addProject, setOpenAddProjectDrawer } from "@/store/features/DailyExpense";
+import { addProject, setOpenAddProjectDrawer as dailyExpenseAddProjectDrawer } from "@/store/features/DailyExpense";
 import { z } from "zod";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
@@ -17,13 +17,15 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useAppSelector } from "@/store/store";
 import { Loader2 } from "lucide-react";
+import { setOpenAddProjectDrawer } from "@/store/features/GetProjects";
 
 interface addProjectFormProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   addProjectBtnLoad:boolean;
+  isDailyExpensePage:boolean;
 }
 
-const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad }) => {
+const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad, isDailyExpensePage }) => {
   const form = useForm<z.infer<typeof addProjectFormSchema>>({
     resolver: zodResolver(addProjectFormSchema),
     defaultValues: {
@@ -36,8 +38,14 @@ const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad }
   const handleFormSubmit = (
     formValue: z.infer<typeof addProjectFormSchema>
   ) => {
+
     dispatch(addProject(formValue)).then(() => form.reset());
-       dispatch(setOpenAddProjectDrawer(true));
+    if(isDailyExpensePage){
+      dispatch(dailyExpenseAddProjectDrawer(true));
+    }else{
+      dispatch(setOpenAddProjectDrawer(false));
+    }
+       
   };
 
   return (

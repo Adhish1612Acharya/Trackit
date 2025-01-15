@@ -78,7 +78,6 @@ const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
             variant="contained"
             size="medium"
             color="error"
-            className="bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg shadow-md hover:bg-blue-700 transition"
             onClick={() => {
               dispatch(setDeleteProjectId(id));
               dispatch(setProjectDeleteAlertOpen(true));

@@ -162,7 +162,7 @@ const DailyExpense = () => {
         isProjectPage={false}
       />
 
-<AddProjectDrawer open={openAddProjectDrawer} dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} />
+<AddProjectDrawer isDailyExpensePage={false} open={openAddProjectDrawer} dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} />
     </Container>
   );
 };

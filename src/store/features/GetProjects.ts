@@ -1,7 +1,6 @@
 import { auth, db } from "@/firebaseconfig";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  arrayRemove,
   collection,
   deleteDoc,
   doc,
@@ -40,6 +39,8 @@ interface initialStateType {
   deleteProjectId: string | null;
   deleteLoad: boolean;
   openProjectDeleteAlert: boolean;
+  openAddProjectDrawer:boolean;
+  addProjectBtnLoad:boolean;
 }
 
 interface getProjectDetailsResponse {
@@ -56,6 +57,8 @@ const initialState: initialStateType = {
   deleteProjectId: null,
   deleteLoad: false,
   openProjectDeleteAlert: false,
+  openAddProjectDrawer:false,
+  addProjectBtnLoad:false,
 };
 
 export const getProjectsDetails = createAsyncThunk<
@@ -98,7 +101,7 @@ export const deleteProject = createAsyncThunk<
   deleteProjectResponse,
   void,
   { rejectValue: string }
->("/applyFilter", async (_value, thunkAPI) => {
+>("/deleteProject", async (_value, thunkAPI) => {
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -165,6 +168,12 @@ const getProjectsSlice = createSlice({
     setDeleteProjectId: (state, action: PayloadAction<string>) => {
       state.deleteProjectId = action.payload;
     },
+    setOpenAddProjectDrawer:(state,action:PayloadAction<boolean>)=>{
+      state.openAddProjectDrawer=action.payload;
+    },
+    setAddProjectBtnLoad:(state,action:PayloadAction<boolean>)=>{
+      state.addProjectBtnLoad=action.payload;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(getProjectsDetails.pending, (state, _action) => {
@@ -206,5 +215,5 @@ const getProjectsSlice = createSlice({
 
 export default getProjectsSlice.reducer;
 
-export const { setProjectDeleteAlertOpen, setDeleteProjectId } =
+export const { setProjectDeleteAlertOpen, setDeleteProjectId,setOpenAddProjectDrawer,setAddProjectBtnLoad } =
   getProjectsSlice.actions;

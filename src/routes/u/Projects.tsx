@@ -1,10 +1,12 @@
+import AddProjectDrawer from "@/components/AddExpenseDrawer/AddProjectDrawer";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
 import ProjectInfoCard from "@/components/ProjectInfoCard";
-import { getProjectsDetails } from "@/store/features/GetProjects";
+import { getProjectsDetails, setOpenAddProjectDrawer } from "@/store/features/GetProjects";
 import { useAppDispatch, useAppSelector } from "@/store/store";
-import { Skeleton } from "@mui/material";
+import { Fab, Skeleton } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import AddIcon from "@mui/icons-material/Add";
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -22,6 +24,15 @@ const Projects = () => {
   const openDeleteAlertDialog = useAppSelector(
     (state) => state.getProjectDetails.openProjectDeleteAlert
   );
+
+  const openAddProjectDrawer = useAppSelector(
+    (state) => state.getProjectDetails.openAddProjectDrawer
+  );
+
+  const addProjectBtnLoad=useAppSelector(state=>
+    state.getProjectDetails.addProjectBtnLoad
+  )
+
 
   useEffect(() => {
     dispatch(getProjectsDetails());
@@ -62,6 +73,20 @@ const Projects = () => {
           </div>
         )}
       </div>
+       {/* Floating Action Button */}
+       <Fab
+        color="primary"
+        aria-label="add"
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          zIndex: 1,
+        }}
+        onClick={() => dispatch(setOpenAddProjectDrawer(true))}
+      >
+        <AddIcon />
+      </Fab>
       <ConformationAlertDialog
         openAlertDialog={openDeleteAlertDialog}
         dispatch={dispatch}
@@ -70,6 +95,8 @@ const Projects = () => {
         dailyExpensePage={false}
         isDeleteProject={true}
       />
+
+<AddProjectDrawer open={openAddProjectDrawer}  isDailyExpensePage={false} dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} />
     </>
   );
 };

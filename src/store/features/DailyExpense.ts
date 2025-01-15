@@ -19,6 +19,7 @@ import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
 import { v4 as uuidv4 } from "uuid";
 import { Console } from "node:console";
+import { allProjectContributerType } from "./EditDeleteExpense";
 
 interface GetUserDailyExpenseResponse {
   userData: any; // Replace `any` with the proper type of your user data if known
@@ -54,6 +55,7 @@ export interface expenseType {
   miscellaneuosPaidToId: string;
   miscellaneuosPaidToName: string;
   billImage: string;
+  owner:string;
 }
 
 export interface filterValueType {
@@ -227,6 +229,80 @@ export const addDailyExpense = createAsyncThunk<
         try {
           const state = thunkAPI.getState() as RootState;
 
+          const normalizeString = (str: string): string => {
+            return str.trim().toLowerCase().replace(/\s+/g, "");
+          };
+
+          const userProjectsCollectionRef = collection(db, "projects");
+
+          const userProjectsRefQuery = query(
+            userProjectsCollectionRef,
+            where("owner", "==", user.uid)
+          );
+
+          let filteredDuplicateMiscbutersContri: allProjectContributerType[] =
+            [];
+
+          if (state.addDailyExpense.miscellaneousInput) {
+            const userProjectsSnapShot = await getDocs(userProjectsRefQuery);
+
+            const userProjectsMiscContributers: allProjectContributerType[][] =
+              userProjectsSnapShot.docs.map((doc) => {
+                const project = doc.data();
+
+                const projectContributers = project.contributers;
+
+                const miscContributer: allProjectContributerType[] =
+                  projectContributers.filter(
+                    (eachContributer: allProjectContributerType) => {
+                      return eachContributer.miscellaneous === true;
+                    }
+                  );
+
+                return miscContributer;
+              });
+
+            const userAllProjectsMiscContributers =
+              userProjectsMiscContributers.flatMap((project) => {
+                return project;
+              });
+
+            filteredDuplicateMiscbutersContri =
+              userAllProjectsMiscContributers.filter((item, index, self) => {
+                const normalizeName = normalizeString(item.name);
+                const normalizeRole = normalizeString(item.miscellaneousRole);
+
+                const uniqueIdx = self.findIndex((each) => {
+                  return (
+                    normalizeString(each.name) === normalizeName &&
+                    normalizeString(each.miscellaneousRole) === normalizeRole
+                  );
+                });
+
+                return index === uniqueIdx;
+              });
+          }
+
+          const findMiscContributerId = () => {
+            const matchedMiscContributer =
+             filteredDuplicateMiscbutersContri.filter(
+                (eachContributer) => {
+                  return (
+                    normalizeString(eachContributer.name) ===
+                      normalizeString(value.miscellaneousPaidToName) &&
+                    normalizeString(eachContributer.miscellaneousRole) ===
+                      normalizeString(value.miscellaneousPaidToRole)
+                  );
+                }
+              );
+            if (matchedMiscContributer.length > 0) {
+              return matchedMiscContributer[0].miscellaneousId;
+            } else {
+              const id=uuidv4();
+              return id;
+            }
+          };
+
           const projectDocRef = doc(db, "projects", value.project);
 
           const projectDoc = await getDoc(projectDocRef);
@@ -234,10 +310,6 @@ export const addDailyExpense = createAsyncThunk<
           const projectData = projectDoc.data();
 
           const contrubutersLists = projectData ? projectData.contributers : [];
-
-          const normalizeString = (str: string): string => {
-            return str.toLowerCase().replace(/\s+/g, "");
-          };
 
           const contributerExists = contrubutersLists.filter(
             (contributer: any) =>
@@ -273,7 +345,9 @@ export const addDailyExpense = createAsyncThunk<
 
           const paymentModeName = findPaymentModeName(value.paymentMode);
 
-          const expenseDocumentData = {
+          const miscellaneousId=findMiscContributerId();
+
+          const expenseDocumentData: any = {
             date: new Date(value.date),
             amount: Number(value.amount),
             reason: value.reason,
@@ -284,11 +358,12 @@ export const addDailyExpense = createAsyncThunk<
             projectId: value.project,
             projectTitle: projectName[0].name,
             miscellaneous: state.addDailyExpense.miscellaneousInput,
-            miscellaneuosPaidToId: state.addDailyExpense.miscellaneousInput
-              ? contributerExists.length == 0
-                ? uuidv4()
-                : contributerExists[0].miscellaneousId
-              : "",
+            miscellaneuosPaidToId:miscellaneousId,
+            //  state.addDailyExpense.miscellaneousInput
+            //   ? contributerExists.length == 0
+            //     ? uuidv4()
+            //     : contributerExists[0].miscellaneousId
+            //   : "",
             miscellaneuosPaidToName: state.addDailyExpense.miscellaneousInput
               ? value.miscellaneousPaidToName
               : "",
@@ -313,7 +388,7 @@ export const addDailyExpense = createAsyncThunk<
                 miscellaneous: true,
                 miscellaneousRole:
                   expenseDocumentData.miscellaneousPaidToRole as string,
-                miscellaneousId: expenseDocumentData.miscellaneuosPaidToId,
+                miscellaneousId: miscellaneousId,
               };
             } else {
               data = {
@@ -361,7 +436,9 @@ export const addDailyExpense = createAsyncThunk<
             (pushTodayExpense as any) = expenseDocumentData;
           }
 
-          expenseDocumentData.date=formattedExpDocDate
+          expenseDocumentData.date = formattedExpDocDate;
+
+          expenseDocumentData.expenseId=newExpense.id;
 
           resolve({
             expenseId: newExpense.id,

@@ -46,7 +46,7 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the expense.
+              This action cannot be undone. This will permanently delete the {isDeleteProject?"project and the expense Related to it":"expense"}.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

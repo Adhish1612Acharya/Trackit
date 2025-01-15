@@ -51,7 +51,6 @@ import { Loader2, Plus } from "lucide-react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DailyExpense from "@/routes/u/DailyExpense";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -308,7 +307,6 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
       setPdfBlob(undefined);
       dispatch(setEditExpenseMiscellaneousInput(false));
     } else {
-      console.log("date : ", formData.date);
 
       const newExpense: formValueType = {
         date: formData.date.toISOString(),
@@ -323,24 +321,11 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
           formData.file === undefined ? "" : await uploadToCloudinary(),
       };
 
-      console.log("ISOdate : ", newExpense.date);
-
       const response = await dispatch(addDailyExpense(newExpense));
 
       if (isProjectPage) {
         const addedExpense: any = (response.payload as addDailyExpenseResponse)
           .newAddedExpense;
-        addedExpense.expenseId = (
-          response.payload as addDailyExpenseResponse
-        ).expenseId;
-        addedExpense.date = new Date(addedExpense.date)
-          .toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })
-          .split("/")
-          .join("-");
         dispatch(addProjectExpense({ expense: addedExpense as expenseType }));
       }
 

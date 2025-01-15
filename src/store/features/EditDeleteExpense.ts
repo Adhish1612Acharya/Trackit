@@ -21,7 +21,7 @@ import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
 import { v4 as uuidv4 } from "uuid";
 
-interface allProjectContributerType {
+export interface allProjectContributerType {
   id: string;
   miscellaneous: boolean;
   miscellaneousId: string;
@@ -99,6 +99,7 @@ const initialState: initialStateType = {
     miscellaneuosPaidToId: "",
     miscellaneuosPaidToName: "",
     billImage: "",
+    owner:""
   },
   expenseId: "",
   dailyExpense: false,
@@ -278,20 +279,20 @@ export const editExpenseDetails = createAsyncThunk<
             });
           };
 
-          const checkMiscellaneousSame = () => {
-            return (
-              normalizeString(
-                state.editDeleteExpense.expenseInfo.miscellaneuosPaidToName
-              ) ===
-                normalizeString(
-                  editFormValue.miscellaneuosPaidToName as string
-                ) &&
-              normalizeString(
-                state.editDeleteExpense.expenseInfo.miscellaneousPaidToRole
-              ) ===
-                normalizeString(editFormValue.miscellaneousPaidToRole as string)
-            );
-          };
+          // const checkMiscellaneousSame = () => {
+          //   return (
+          //     normalizeString(
+          //       state.editDeleteExpense.expenseInfo.miscellaneuosPaidToName
+          //     ) ===
+          //       normalizeString(
+          //         editFormValue.miscellaneuosPaidToName as string
+          //       ) &&
+          //     normalizeString(
+          //       state.editDeleteExpense.expenseInfo.miscellaneousPaidToRole
+          //     ) ===
+          //       normalizeString(editFormValue.miscellaneousPaidToRole as string)
+          //   );
+          // };
 
           //
 
@@ -318,7 +319,7 @@ export const editExpenseDetails = createAsyncThunk<
                     )
           );
 
-          const findMiscContributerId = () => {
+         const findMiscContributerId = () => {
             const matchedMiscContributer =
               state.editDeleteExpense.allProjectMiscContributer.filter(
                 (eachContributer) => {
@@ -330,14 +331,14 @@ export const editExpenseDetails = createAsyncThunk<
                   );
                 }
               );
-            if (
-              matchedMiscContributer.length > 0
-            ) {
+            if (matchedMiscContributer.length > 0) {
               return matchedMiscContributer[0].miscellaneousId;
-            } else  {
+            } else {
               return uuidv4();
             }
           };
+
+            const miscellaneousId=findMiscContributerId();
 
           if (contributerExists.length == 0) {
             if (state.editDeleteExpense.miscellaneuosInput) {
@@ -347,7 +348,7 @@ export const editExpenseDetails = createAsyncThunk<
                 miscellaneous: true,
                 miscellaneousRole:
                   editFormValue.miscellaneousPaidToRole as string,
-                miscellaneousId: findMiscContributerId(),
+                miscellaneousId: miscellaneousId,
               };
             } else {
               contributerData = {
@@ -362,7 +363,7 @@ export const editExpenseDetails = createAsyncThunk<
 
           // -------------------***Checking Contributer already exists***-------------------------//
 
-          const updatedFormValue: any = {
+          const updatedFormValue:any= {
             date: new Date(editFormValue.date),
             amount: editFormValue.amount,
             paidToId: editFormValue.paidToId,
@@ -378,22 +379,25 @@ export const editExpenseDetails = createAsyncThunk<
                 : state.editDeleteExpense.expenseInfo?.projectTitle,
             reason: editFormValue.reason,
             miscellaneous: state.editDeleteExpense.miscellaneuosInput,
+            miscellaneuosPaidToName: state.editDeleteExpense.miscellaneuosInput
+              ? editFormValue.miscellaneuosPaidToName
+              : "",
             miscellaneousPaidToRole: state.editDeleteExpense.miscellaneuosInput
               ? editFormValue.miscellaneousPaidToRole
               : "",
             miscellaneuosPaidToId: state.editDeleteExpense.miscellaneuosInput
-              ? (checkMiscellaneousSame() && contributerExists.length > 0) ||
-                (!checkMiscellaneousSame() && contributerExists.length > 0)
-                ? contributerExists[0].miscellaneousId
-                : // state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
-                checkMiscellaneousSame() && contributerExists.length == 0
-                ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
-                : uuidv4()
+              ? miscellaneousId
               : "",
-            miscellaneuosPaidToName: state.editDeleteExpense.miscellaneuosInput
-              ? editFormValue.miscellaneuosPaidToName
-              : "",
-            billImage: editFormValue.billImage ? editFormValue.billImage : "",
+            billImage: editFormValue.billImage ? editFormValue.billImage as string : "",
+            owner:user.uid
+            // (checkMiscellaneousSame() && contributerExists.length > 0) ||
+            //   (!checkMiscellaneousSame() && contributerExists.length > 0)
+            //   ? contributerExists[0].miscellaneousId
+            //   : // state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+            //   checkMiscellaneousSame() && contributerExists.length == 0
+            //   ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+            //     : uuidv4()
+            //   : "",
           };
 
           const expenseDocRef = doc(
@@ -404,8 +408,8 @@ export const editExpenseDetails = createAsyncThunk<
 
           await updateDoc(expenseDocRef, updatedFormValue);
 
-          updatedFormValue.expenseId = state.editDeleteExpense.expenseId;
-          updatedFormValue.date = String(updatedFormValue.date);
+          updatedFormValue.expenseId  = state.editDeleteExpense.expenseId;
+          updatedFormValue.date =String(editFormValue.date);
 
           if (
             editFormValue.projectId !==
@@ -479,7 +483,6 @@ export const deleteExpenseDetails = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          console.log("expenseId", expenseId);
           const expenseDocRef = doc(db, "expense", expenseId);
           const expenseDocSnap = await getDoc(expenseDocRef);
 
