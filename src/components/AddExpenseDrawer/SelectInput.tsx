@@ -36,8 +36,9 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
     return (
       <div ref={ref}>
         <Select
+      defaultValue={options.length===1 ?String(options[0].id):undefined}
           name={title}
-          value={form.getValues(field.name)}
+          value={options.length===1?form.setValue(title,options[0].id):form.getValues(field.name)}
           onValueChange={(value) => {
             field.onChange(value); // Update the form field value
             if (!filterSelect) {
@@ -64,14 +65,14 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
               zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
             }}
             
-            side={"bottom"}
+            side={"top"}
             
           >
-            <SelectGroup >
+            <SelectGroup  >
               <SelectLabel>{title}</SelectLabel>
               {options.map((option) => {
                 return (
-                  <SelectItem key={option.id} value={String(option.id)}>
+                  <SelectItem   key={option.id} value={String(option.id)}>
                     {option.name}
                   </SelectItem>
                 );

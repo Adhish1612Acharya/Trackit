@@ -16,9 +16,10 @@ import AddProjectForm from "./AddProjectForm";
 interface addProjectDrawerProps {
   open: boolean;
   dispatch: ThunkDispatch<RootState, undefined, Action>;
+  addProjectBtnLoad:boolean;
 }
 
-const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch }) => {
+const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch ,addProjectBtnLoad}) => {
 
   return (
     <Dialog
@@ -33,7 +34,7 @@ const AddProjectDrawer: FC<addProjectDrawerProps> = ({ open, dispatch }) => {
           <DialogTitle>Add Project</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <AddProjectForm dispatch={dispatch} />
+          <AddProjectForm dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} />
         </div>
       </DialogContent>
     </Dialog>

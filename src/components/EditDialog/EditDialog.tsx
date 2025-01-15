@@ -20,6 +20,8 @@ interface EditDialogProps {
   editInfoLoad: boolean;
   editFuncLoading: boolean;
   miscellaneousInput:boolean;
+  isDailyExpense:boolean;
+  isProjectPage:boolean;
 }
 
 const EditDialog: FC<EditDialogProps> = ({
@@ -30,7 +32,9 @@ const EditDialog: FC<EditDialogProps> = ({
   projectOptions,
   editInfoLoad,
   editFuncLoading,
-  miscellaneousInput
+  miscellaneousInput,
+  isDailyExpense,
+  isProjectPage
 }) => {
   const theme = useTheme();
 
@@ -69,6 +73,8 @@ const EditDialog: FC<EditDialogProps> = ({
             editExpenseCurrentProject={editExpenseCurrentProject}
             loading={editFuncLoading}
             miscellaneousInput={miscellaneousInput}
+            isDailyExpense={isDailyExpense}
+            isProjectPage={isProjectPage}
           />
         )}
       </div>

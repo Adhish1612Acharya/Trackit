@@ -146,7 +146,7 @@ const DataTable: FC<dataTableProps> = ({
             boxShadow: 3, // Add shadow for modern UI
           }}
         >
-          {expense.length === 0 ? (
+          {expense && expense.length === 0 ? (
             <h1>No expense added</h1>
           ) : (
             expense.map((eachExpense, index) => (

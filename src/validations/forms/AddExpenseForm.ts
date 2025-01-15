@@ -22,13 +22,13 @@ const addExpenseFormSchema = z.object({
     .refine((value) => /^(?!\s*$).+/.test(value), {
       message: "Enter name",
     })
-    .optional(),
+   ,
   miscellaneousPaidToRole: z
     .string()
     .refine((value) => /^(?!\s*$).+/.test(value), {
       message: "Enter role",
     })
-    .optional(),
+   ,
   paymentMode: z.string().min(1, { message: "Enter payment mode" }),
   project: z.string().min(1, { message: "Enter the project" }),
 });

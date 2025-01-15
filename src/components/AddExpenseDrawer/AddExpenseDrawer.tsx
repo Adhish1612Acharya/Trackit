@@ -19,6 +19,8 @@ export interface addExpenseDrawerProps {
   projectOptions: projectOptionsType[];
   loading: boolean;
   miscellaneousInput: boolean;
+  isDailyExpense:boolean,
+  isProjectPage:boolean
 }
 
 const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
@@ -27,6 +29,8 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
   loading,
   projectOptions,
   miscellaneousInput,
+  isDailyExpense,
+  isProjectPage
 }) => {
   const theme = useTheme();
 
@@ -59,6 +63,9 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
           projectOptions={projectOptions}
           loading={loading}
           miscellaneousInput={miscellaneousInput}
+          isDailyExpense={isDailyExpense}
+          isProjectPage={isProjectPage}
+          editForm={false}
         />
       </DialogContent>
     </Dialog>

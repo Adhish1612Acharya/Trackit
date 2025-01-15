@@ -21,6 +21,8 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
 import {
   addDailyExpense,
+  addDailyExpenseResponse,
+  addProject,
   expenseType,
   formValueType,
   getUserDailyExpense,
@@ -41,11 +43,15 @@ import {
   setEditFuncLoad,
   setExpenseBillImage,
 } from "@/store/features/EditDeleteExpense";
-import { getUserProjectExpense } from "@/store/features/ProjectDetails";
+import {
+  addProjectExpense,
+  getUserProjectExpense,
+} from "@/store/features/ProjectDetails";
 import { Loader2, Plus } from "lucide-react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DailyExpense from "@/routes/u/DailyExpense";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -67,7 +73,8 @@ interface addExpenseFormProps {
   editExpenseCurrentProject?: { id: string; name: string };
   loading: boolean;
   miscellaneousInput: boolean;
-  // pdfBlob:Blob | undefined;
+  isDailyExpense: boolean;
+  isProjectPage: boolean;
 }
 
 const AddExpenseForm: FC<addExpenseFormProps> = ({
@@ -78,7 +85,8 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   editExpenseCurrentProject,
   loading,
   miscellaneousInput,
-  // pdfBlob
+  isDailyExpense,
+  isProjectPage,
 }) => {
   const [pdfBlob, setPdfBlob] = useState<Blob | undefined>(undefined);
 
@@ -86,12 +94,16 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
     resolver: zodResolver(addExpenseFormSchema),
     defaultValues: {
       date: editForm ? convertDateFormat(String(expense?.date)) : new Date(),
-      amount: editForm ? String(expense?.amount) : "0",
+      amount: editForm ? String(expense?.amount) : "",
       reason: editForm ? expense?.reason : "",
       file: undefined,
       paidTo: editForm ? expense?.paidToId : undefined,
       paymentMode: editForm ? expense?.paymentModeId : undefined,
-      project: editForm ? editExpenseCurrentProject?.id : undefined,
+      project: editForm
+        ? editExpenseCurrentProject?.id
+        : projectOptions.length == 1
+        ? projectOptions[0].id
+        : undefined,
       miscellaneousPaidToName: editForm
         ? expense?.miscellaneuosPaidToName !== ""
           ? expense?.miscellaneuosPaidToName
@@ -143,7 +155,6 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
       try {
         const res = await fetch(uploadUrl, options);
         const data = await res.json();
-        console.log("res.url", data.url);
         return data.url; // Make sure the URL is returned
       } catch (err: any) {
         console.error("Upload Failed:", err);
@@ -249,21 +260,22 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   };
 
   const onSubmit = async (formData: z.infer<typeof addExpenseFormSchema>) => {
-    console.log("FormData : ", formData);
     if (editForm) {
       const editedFormData: editedFormValueType = {
         date: formData.date,
         amount: Number(formData.amount),
-        reason: formData.reason,
+        reason: formData.reason.trim(),
         projectId: formData.project,
         paidToId: formData.paidTo,
         billImage:
           formData.file !== undefined && pdfBlob !== undefined
             ? await uploadToCloudinary()
-            : (expense?.billImage?expense?.billImage:"" as string),
+            : expense?.billImage
+            ? expense?.billImage
+            : ("" as string),
         paymentModeId: formData.paymentMode,
         miscellaneousPaidToRole: formData.miscellaneousPaidToRole
-          ? formData.miscellaneousPaidToRole
+          ? formData.miscellaneousPaidToRole.trim()
           : "",
         miscellaneuosPaidToId: editForm
           ? expense
@@ -271,17 +283,15 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
             : ""
           : "",
         miscellaneuosPaidToName: formData.miscellaneousPaidToName
-          ? formData.miscellaneousPaidToName
+          ? formData.miscellaneousPaidToName.trim()
           : "",
       };
 
-      console.log(editedFormData);
-
       await dispatch(editExpenseDetails({ editFormValue: editedFormData }));
 
-      if (window.location.href === `${import.meta.env.VITE_WEB_URL}/u/daily-expense`) {
+      if (isDailyExpense) {
         await dispatch(getUserDailyExpense());
-      } else if (window.location.pathname.startsWith(`${import.meta.env.VITE_WEB_URL}/u/projects/${expense?.projectId}`)) {
+      } else if (isProjectPage) {
         await dispatch(getUserProjectExpense(expense ? expense.projectId : ""));
       }
 
@@ -298,28 +308,51 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
       setPdfBlob(undefined);
       dispatch(setEditExpenseMiscellaneousInput(false));
     } else {
+      console.log("date : ", formData.date);
+
       const newExpense: formValueType = {
-        date: formData.date,
+        date: formData.date.toISOString(),
         amount: formData.amount,
-        reason: formData.reason,
+        reason: formData.reason.trim(),
         paidTo: formData.paidTo,
         paymentMode: formData.paymentMode,
         project: formData.project,
-        miscellaneousPaidToName: formData.miscellaneousPaidToName,
-        miscellaneousPaidToRole: formData.miscellaneousPaidToRole,
+        miscellaneousPaidToName: formData.miscellaneousPaidToName.trim(),
+        miscellaneousPaidToRole: formData.miscellaneousPaidToRole.trim(),
         billImage:
           formData.file === undefined ? "" : await uploadToCloudinary(),
       };
 
-      console.log(newExpense);
+      console.log("ISOdate : ", newExpense.date);
 
-      await dispatch(addDailyExpense(newExpense));
+      const response = await dispatch(addDailyExpense(newExpense));
+
+      if (isProjectPage) {
+        const addedExpense: any = (response.payload as addDailyExpenseResponse)
+          .newAddedExpense;
+        addedExpense.expenseId = (
+          response.payload as addDailyExpenseResponse
+        ).expenseId;
+        addedExpense.date = new Date(addedExpense.date)
+          .toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
+          .split("/")
+          .join("-");
+        dispatch(addProjectExpense({ expense: addedExpense as expenseType }));
+      }
+
       form.reset();
       form.setValue("miscellaneousPaidToName", "");
       form.setValue("miscellaneousPaidToRole", "");
       form.setValue("paidTo", ""); // or set to undefined
       form.setValue("paymentMode", ""); // or set to undefined
-      form.setValue("project", "");
+      if (projectOptions.length !== 1) {
+        form.setValue("project", "");
+      }
+
       setPdfBlob(undefined);
       dispatch(setMiscellaneousInput(false));
     }
@@ -552,7 +585,17 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   <FormItem style={{ flex: 1, width: "50%" }}>
                     <FormLabel>Miscellaneous Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter the name" {...field} />
+                      <Input
+                        onInput={(e) => {
+                          const input = e.target as HTMLInputElement;;
+                          input.value = input.value
+                            .toLowerCase()
+                            .replace(/\s+/g, "");
+                          field.onChange(input.value); // Update form state
+                        }}
+                        placeholder="Enter the name"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -565,7 +608,15 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   <FormItem style={{ width: "50%" }}>
                     <FormLabel>Miscellaneous Role</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter the role" {...field} />
+                      <Input 
+                       onInput={(e) => {
+                        const input = e.target as HTMLInputElement;;
+                        input.value = input.value
+                          .toLowerCase()
+                          .replace(/\s+/g, "");
+                        field.onChange(input.value); // Update form state
+                      }}
+                      placeholder="Enter the role" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -609,7 +660,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                 </FormItem>
               )}
             />
-            {!editForm && (
+            {!editForm && isDailyExpense && (
               <Button
                 variant="outline"
                 size="icon"
@@ -643,15 +694,10 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                 Please wait
               </Button>
             ) : (
-              <Button
-                color="primary"
-                type="submit"
-                className={ "w-full mx-1" }
-              >
+              <Button color="primary" type="submit" className={"w-full mx-1"}>
                 {editForm ? "Save" : "Add Expense"}
               </Button>
             )}
-
 
             {/* {!editForm && (
               <Button

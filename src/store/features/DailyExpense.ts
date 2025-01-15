@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   Timestamp,
   updateDoc,
@@ -17,6 +18,7 @@ import { RootState } from "../store";
 import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
 import { v4 as uuidv4 } from "uuid";
+import { Console } from "node:console";
 
 interface GetUserDailyExpenseResponse {
   userData: any; // Replace `any` with the proper type of your user data if known
@@ -31,9 +33,9 @@ export interface formValueType {
   paidTo: string;
   paymentMode: string;
   project: string;
-  miscellaneousPaidToName?: string;
-  miscellaneousPaidToRole?: string;
-  billImage:Promise<string>|string;
+  miscellaneousPaidToName: string;
+  miscellaneousPaidToRole: string;
+  billImage: Promise<string> | string;
 }
 
 export interface expenseType {
@@ -51,7 +53,7 @@ export interface expenseType {
   miscellaneousPaidToRole: string;
   miscellaneuosPaidToId: string;
   miscellaneuosPaidToName: string;
-  billImage:string;
+  billImage: string;
 }
 
 export interface filterValueType {
@@ -89,6 +91,24 @@ interface initialStateType {
   totalValue: number;
 }
 
+interface addedExpnseType {
+  date: Date;
+  amount: number;
+  reason: string;
+  paidToId: string | number;
+  paidToName: string;
+  paymentModeId: string | number;
+  paymentModeName: string;
+  projectId: string | number;
+  projectTitle: string;
+  miscellaneous: boolean;
+  miscellaneuosPaidToId: string;
+  miscellaneuosPaidToName: string;
+  miscellaneousPaidToRole: string;
+  owner: string;
+  billImage: Promise<string> | string;
+}
+
 const initialState: initialStateType = {
   projectsOptions: [],
   filterProjects: [],
@@ -104,6 +124,12 @@ const initialState: initialStateType = {
   dataTableLoader: false,
   totalValue: 0,
 };
+
+export interface addDailyExpenseResponse {
+  expenseId: string;
+  todayExpense: expenseType | null;
+  newAddedExpense: addedExpnseType;
+}
 
 export const getUserDailyExpense = createAsyncThunk<
   GetUserDailyExpenseResponse,
@@ -132,7 +158,8 @@ export const getUserDailyExpense = createAsyncThunk<
             collection(db, "expense"),
             where("owner", "==", user.uid),
             where("date", ">=", startTimestamp),
-            where("date", "<=", endTimestamp)
+            where("date", "<=", endTimestamp),
+            orderBy("date", "asc")
           );
           const querySnapShot = await getDocs(userExpenseQuery);
 
@@ -188,11 +215,6 @@ export const getUserDailyExpense = createAsyncThunk<
     });
   });
 });
-
-interface addDailyExpenseResponse {
-  expenseId: string;
-  todayExpense: expenseType | null;
-}
 
 export const addDailyExpense = createAsyncThunk<
   addDailyExpenseResponse,
@@ -262,17 +284,19 @@ export const addDailyExpense = createAsyncThunk<
             projectId: value.project,
             projectTitle: projectName[0].name,
             miscellaneous: state.addDailyExpense.miscellaneousInput,
-            // value.miscellaneousPaidToName !== "null" &&
-            // value.miscellaneousPaidToRole !== "null"
-            //   ? true
-            //   : false,
             miscellaneuosPaidToId: state.addDailyExpense.miscellaneousInput
-              ?contributerExists.length==0? uuidv4():contributerExists[0].miscellaneousId
+              ? contributerExists.length == 0
+                ? uuidv4()
+                : contributerExists[0].miscellaneousId
               : "",
-            miscellaneuosPaidToName: state.addDailyExpense.miscellaneousInput? value.miscellaneousPaidToName:"",
-            miscellaneousPaidToRole: state.addDailyExpense.miscellaneousInput? value.miscellaneousPaidToRole:"",
+            miscellaneuosPaidToName: state.addDailyExpense.miscellaneousInput
+              ? value.miscellaneousPaidToName
+              : "",
+            miscellaneousPaidToRole: state.addDailyExpense.miscellaneousInput
+              ? value.miscellaneousPaidToRole
+              : "",
             owner: user.uid,
-            billImage:value.billImage?value.billImage:""
+            billImage: value.billImage ? value.billImage : "",
           };
 
           const newExpense = await addDoc(
@@ -296,8 +320,8 @@ export const addDailyExpense = createAsyncThunk<
                 id: value.paidTo,
                 name: paidToRoleName[0].name,
                 miscellaneous: false,
-                miscellaneousRole: null,
-                miscellaneousId: null,
+                miscellaneousRole: "",
+                miscellaneousId: "",
               };
             }
 
@@ -321,7 +345,7 @@ export const addDailyExpense = createAsyncThunk<
             .split("/")
             .join("-");
 
-          const formattedExpDocDate = (value.date as Date)
+          const formattedExpDocDate = (new Date(value.date) as Date)
             .toLocaleDateString("en-GB", {
               day: "2-digit",
               month: "2-digit",
@@ -337,9 +361,12 @@ export const addDailyExpense = createAsyncThunk<
             (pushTodayExpense as any) = expenseDocumentData;
           }
 
+          expenseDocumentData.date=formattedExpDocDate
+
           resolve({
             expenseId: newExpense.id,
             todayExpense: pushTodayExpense,
+            newAddedExpense: expenseDocumentData,
           });
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -449,7 +476,8 @@ export const applyFilter = createAsyncThunk<
             collection(db, "expense"),
             where("owner", "==", user.uid),
             where("date", ">=", startTimestamp),
-            where("date", "<=", endTimestamp)
+            where("date", "<=", endTimestamp),
+            orderBy("date", "asc")
           );
 
           // Dynamically add filters from formattedFilterData
@@ -485,7 +513,7 @@ export const applyFilter = createAsyncThunk<
 
               eachDoc.date = formattedDate;
 
-              eachDoc.expenseId=doc.id;
+              eachDoc.expenseId = doc.id;
 
               return eachDoc;
             });
@@ -555,9 +583,9 @@ const dailyExpenseSlice = createSlice({
         0
       );
     },
-    setAddExpenseLoad:(state,action:PayloadAction<boolean>)=>{
-        state.addExpenseBtnLoad=action.payload;
-    }
+    setAddExpenseLoad: (state, action: PayloadAction<boolean>) => {
+      state.addExpenseBtnLoad = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserDailyExpense.pending, (state, _action) => {
@@ -589,7 +617,7 @@ const dailyExpenseSlice = createSlice({
       state.addExpenseBtnLoad = false;
 
       if (action.payload.todayExpense !== null) {
-        action.payload.todayExpense.expenseId = action.payload.expenseId;
+        // action.payload.todayExpense.expenseId = action.payload.expenseId;
         state.expense.push(action.payload.todayExpense);
         state.totalValue += action.payload.todayExpense.amount;
       }
@@ -657,5 +685,5 @@ export const {
   setOpenFilterDrawer,
   setEditedExpenseInfo,
   setDeletedExpenseInfo,
-  setAddExpenseLoad
+  setAddExpenseLoad,
 } = dailyExpenseSlice.actions;

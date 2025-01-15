@@ -2,13 +2,16 @@ import { useParams } from "react-router-dom";
 // DailyExpense.js
 import { useEffect } from "react";
 import DataTable from "@/components/DataTable/DataTable";
-import { Container } from "@mui/material";
+import { Container, Fab } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import FilterDrawer from "@/components/FilterDrawer";
 import { getUserProjectExpense } from "@/store/features/ProjectDetails";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
 import EditDialog from "@/components/EditDialog/EditDialog";
 import { setEditDrawerOpen } from "@/store/features/EditDeleteExpense";
+import AddExpenseDrawer from "@/components/AddExpenseDrawer/AddExpenseDrawer";
+import AddIcon from "@mui/icons-material/Add";
+import { setOpenAddExpenseDrawer } from "@/store/features/DailyExpense";
 
 const ProjectExpense = () => {
   const { id } = useParams();
@@ -76,6 +79,16 @@ const ProjectExpense = () => {
     (state) => state.editDeleteExpense.miscellaneuosInput
   )
 
+  const addExpenseLoading=useAppSelector(
+    (state) => state.addDailyExpense.addExpenseBtnLoad
+  ) 
+
+  const openAddExpenseDrawer = useAppSelector(
+    (state) => state.addDailyExpense.openAddExpenseDrawer
+  );
+
+  const miscellaneousInput=useAppSelector(state=>state.addDailyExpense.miscellaneousInput);
+
   useEffect(() => {
     dispatch(getUserProjectExpense(id as string));
   }, [dispatch, id]);
@@ -92,6 +105,8 @@ const ProjectExpense = () => {
 
   return (
     <Container className="max-w-full">
+
+
       <DataTable
         expense={dailyExpense}
         dispatch={dispatch}
@@ -101,6 +116,20 @@ const ProjectExpense = () => {
         projectName={projectTitle}
         dataTableLoader={dataTableLoader}
       />
+
+<Fab
+        color="primary"
+        aria-label="add"
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          zIndex: 1,
+        }}
+        onClick={() => dispatch(setOpenAddExpenseDrawer(true))}
+      >
+        <AddIcon />
+      </Fab>
 
       <FilterDrawer
         open={filterDrawerOpen}
@@ -127,6 +156,18 @@ const ProjectExpense = () => {
         editInfoLoad={editInfoLoad}
         editFuncLoading={editExpenseLoading}
       miscellaneousInput={editDeleteExpenseMiscellaneousInput}
+      isDailyExpense={false}
+      isProjectPage={true}
+      />
+
+<AddExpenseDrawer
+        openDrawer={openAddExpenseDrawer}
+        dispatch={dispatch}
+        projectOptions={[{id:id?id:"",name:projectTitle}]}
+        loading={addExpenseLoading}
+        miscellaneousInput={miscellaneousInput}
+        isDailyExpense={false}
+        isProjectPage={true}
       />
     </Container>
   );

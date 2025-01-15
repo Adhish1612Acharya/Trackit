@@ -19,6 +19,7 @@ import { FC } from "react";
 import { Loader2 } from "lucide-react";
 import { setDeletedExpenseInfo } from "@/store/features/DailyExpense";
 import { setDeletedProjectExpenseInfo } from "@/store/features/ProjectDetails";
+import { deleteProject, setProjectDeleteAlertOpen } from "@/store/features/GetProjects";
 
 interface conformationAlertDialogType {
   openAlertDialog: boolean;
@@ -26,6 +27,7 @@ interface conformationAlertDialogType {
   expenseId: string;
   deleteFuncLoad: boolean;
   dailyExpensePage: boolean;
+  isDeleteProject?:boolean;
 }
 
 const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
@@ -34,6 +36,7 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
   expenseId,
   deleteFuncLoad,
   dailyExpensePage,
+  isDeleteProject
 }) => {
   return (
     <AlertDialog
@@ -56,6 +59,7 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
             <>
               <AlertDialogCancel
                 onClick={() => {
+                  isDeleteProject?dispatch(setProjectDeleteAlertOpen(false)):
                   dispatch(
                     setDeleteConformationDrawerOpen({
                       open: false,
@@ -69,6 +73,7 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
               <AlertDialogAction
                 style={{ backgroundColor: "red" }}
                 onClick={() => {
+                  isDeleteProject?dispatch(deleteProject()):
                   dispatch(deleteExpenseDetails({ expenseId })).then(() => {
                     dailyExpensePage ?
                       dispatch(setDeletedExpenseInfo(expenseId))

@@ -88,6 +88,8 @@ const DailyExpense = () => {
 
   const miscellaneousInput=useAppSelector(state=>state.addDailyExpense.miscellaneousInput);
 
+  const addProjectBtnLoad=useAppSelector((state) => state.addDailyExpense.addProjectBtnLoad) 
+
   useEffect(() => {
     dispatch(getUserDailyExpense());
   }, [dispatch, setIsLoggedIn]);
@@ -146,6 +148,8 @@ const DailyExpense = () => {
         editInfoLoad={editInfoLoad }
         editFuncLoading={editExpenseLoading}
       miscellaneousInput={editDeleteExpenseMiscellaneousInput}
+      isDailyExpense={true}
+      isProjectPage={false}
       />
 
 <AddExpenseDrawer
@@ -154,9 +158,11 @@ const DailyExpense = () => {
         projectOptions={projectOptions}
         loading={addExpenseLoading}
         miscellaneousInput={miscellaneousInput}
+        isDailyExpense={true}
+        isProjectPage={false}
       />
 
-<AddProjectDrawer open={openAddProjectDrawer} dispatch={dispatch} />
+<AddProjectDrawer open={openAddProjectDrawer} dispatch={dispatch} addProjectBtnLoad={addProjectBtnLoad} />
     </Container>
   );
 };

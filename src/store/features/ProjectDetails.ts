@@ -6,6 +6,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  orderBy,
   query,
   Timestamp,
   where,
@@ -41,6 +42,27 @@ interface GetUserDailyExpenseResponse {
   total: number;
 }
 
+interface filterData {
+  filteredExpense: expenseType[] | [];
+  total: number;
+}
+
+export interface filterValueType {
+  paidToId: string;
+  paymentModeId: string;
+  projectId: string;
+}
+
+interface argsType {
+  filterValue: {
+    paidToId: string;
+    paymentModeId: string;
+    date: string;
+  };
+
+  projectId: string;
+}
+
 export const getUserProjectExpense = createAsyncThunk<
   GetUserDailyExpenseResponse,
   string,
@@ -56,7 +78,8 @@ export const getUserProjectExpense = createAsyncThunk<
           const userExpenseQuery = query(
             collection(db, "expense"),
             where("owner", "==", user.uid),
-            where("projectId", "==", projectId)
+            where("projectId", "==", projectId),
+            orderBy("date", "asc")
           );
           const querySnapShot = await getDocs(userExpenseQuery);
 
@@ -78,6 +101,8 @@ export const getUserProjectExpense = createAsyncThunk<
 
             eachDoc.date = formattedDate;
             eachDoc.expenseId = doc.id;
+
+            if (!eachDoc.billImage) eachDoc.billImage === "";
 
             return eachDoc;
           });
@@ -122,27 +147,6 @@ export const getUserProjectExpense = createAsyncThunk<
     });
   });
 });
-
-interface filterData {
-  filteredExpense: expenseType[] | [];
-  total: number;
-}
-
-export interface filterValueType {
-  paidToId: string;
-  paymentModeId: string;
-  projectId: string;
-}
-
-interface argsType {
-  filterValue: {
-    paidToId: string;
-    paymentModeId: string;
-    date: string;
-  };
-
-  projectId: string;
-}
 
 export const projectDetailsApplyFilter = createAsyncThunk<
   filterData,
@@ -192,13 +196,15 @@ export const projectDetailsApplyFilter = createAsyncThunk<
               where("owner", "==", user.uid),
               where("projectId", "==", value.projectId),
               where("date", ">=", startTimestamp),
-              where("date", "<=", endTimestamp)
+              where("date", "<=", endTimestamp),
+              orderBy("date", "asc")
             );
           } else {
             projectQueryExpense = query(
               collection(db, "expense"),
               where("owner", "==", user.uid),
-              where("projectId", "==", value.projectId)
+              where("projectId", "==", value.projectId),
+              orderBy("date", "asc")
             );
           }
 
@@ -237,7 +243,7 @@ export const projectDetailsApplyFilter = createAsyncThunk<
 
               eachDoc.date = formattedDate;
 
-              eachDoc.expenseId=doc.id;
+              eachDoc.expenseId = doc.id;
 
               return eachDoc;
             });
@@ -261,6 +267,8 @@ export const projectDetailsApplyFilter = createAsyncThunk<
     });
   });
 });
+
+
 
 const getProjectDetailsSlice = createSlice({
   name: "getProjectDetails",
@@ -291,6 +299,41 @@ const getProjectDetailsSlice = createSlice({
         (accum, eachExpense) => accum + Number(eachExpense.amount),
         0
       );
+    },
+    addProjectExpense: (
+      state,
+      action: PayloadAction<{ expense: expenseType }>
+    ) => {
+      const newExpense = action.payload.expense;
+
+      // Convert 'day-month-year' format to a comparable string 'YYYY-MM-DD'
+      const newExpenseDate = (newExpense.date as string)
+        .split("-")
+        .reverse()
+        .join("-");
+
+      const todayDate = new Date().toLocaleDateString("en-CA");
+
+      if (newExpenseDate === todayDate || state.expense.length == 0) {
+        state.expense.push(newExpense);
+      } else {
+        // Find the correct index to insert the new expense
+        const index = state.expense.findIndex((expense) => {
+          const expenseDate = (expense.date as string)
+            .split("-")
+            .reverse()
+            .join("-");
+          return newExpenseDate < expenseDate; // Insert before the first expense with a later date
+        });
+
+        if (index === -1) {
+          // If no such expense exists, add it to the end
+          state.expense.push(newExpense);
+        } else {
+          // Insert the new expense at the correct index
+          state.expense.splice(index, 0, newExpense);
+        }
+      }
     },
   },
   extraReducers: (builder) => {
@@ -341,4 +384,5 @@ export const {
   setProjectName,
   setEditedProjectExpenseInfo,
   setDeletedProjectExpenseInfo,
+  addProjectExpense,
 } = getProjectDetailsSlice.actions;

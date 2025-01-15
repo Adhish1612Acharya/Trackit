@@ -4,11 +4,15 @@ import { auth, db } from "@/firebaseconfig";
 import {
   arrayRemove,
   arrayUnion,
+  collection,
   deleteDoc,
   doc,
   getDoc,
+  getDocs,
+  query,
   Timestamp,
   updateDoc,
+  where,
   writeBatch,
 } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -16,6 +20,14 @@ import { RootState } from "../store";
 import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
 import { v4 as uuidv4 } from "uuid";
+
+interface allProjectContributerType {
+  id: string;
+  miscellaneous: boolean;
+  miscellaneousId: string;
+  miscellaneousRole: string;
+  name: string;
+}
 
 interface initialStateType {
   editDrawerOpen: boolean;
@@ -29,41 +41,13 @@ interface initialStateType {
   miscellaneuosInput: boolean;
   editProjectOptions: { id: string; name: string }[];
   currrentProject: { id: string; name: string };
+  allProjectMiscContributer: allProjectContributerType[];
 }
-
-const initialState: initialStateType = {
-  editDrawerOpen: false,
-  editInfoLoad: true,
-  editFuncLoad: false,
-  expenseInfo: {
-    expenseId: "",
-    date: "",
-    amount: -1,
-    paidToId: "",
-    paidToName: "",
-    paymentModeId: "",
-    paymentModeName: "",
-    projectId: "",
-    projectTitle: "",
-    reason: "",
-    miscellaneous: false,
-    miscellaneousPaidToRole: "",
-    miscellaneuosPaidToId: "",
-    miscellaneuosPaidToName: "",
-    billImage: "",
-  },
-  expenseId: "",
-  dailyExpense: false,
-  deleteFuncLoad: false,
-  deleteConformationDrawerOpen: false,
-  miscellaneuosInput: false,
-  currrentProject: { id: "", name: "" },
-  editProjectOptions: [],
-};
 
 interface getExpenseDetailsResponseType {
   expenseDetails: expenseType;
   projectOptions: { id: string; name: string }[];
+  userAllProjectMiscContributers: allProjectContributerType[];
 }
 
 interface editExpenseDetailsResponseType {
@@ -95,6 +79,37 @@ export interface contributer {
   name: string;
 }
 
+const initialState: initialStateType = {
+  editDrawerOpen: false,
+  editInfoLoad: true,
+  editFuncLoad: false,
+  expenseInfo: {
+    expenseId: "",
+    date: "",
+    amount: -1,
+    paidToId: "",
+    paidToName: "",
+    paymentModeId: "",
+    paymentModeName: "",
+    projectId: "",
+    projectTitle: "",
+    reason: "",
+    miscellaneous: false,
+    miscellaneousPaidToRole: "",
+    miscellaneuosPaidToId: "",
+    miscellaneuosPaidToName: "",
+    billImage: "",
+  },
+  expenseId: "",
+  dailyExpense: false,
+  deleteFuncLoad: false,
+  deleteConformationDrawerOpen: false,
+  miscellaneuosInput: false,
+  currrentProject: { id: "", name: "" },
+  editProjectOptions: [],
+  allProjectMiscContributer: [],
+};
+
 export const getExpenseDetails = createAsyncThunk<
   getExpenseDetailsResponseType,
   string,
@@ -104,7 +119,56 @@ export const getExpenseDetails = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          const docRef = doc(db, "expense", id); // Reference to the specific document
+          const userProjectsCollectionRef = collection(db, "projects");
+
+          const userProjectsRefQuery = query(
+            userProjectsCollectionRef,
+            where("owner", "==", user.uid)
+          );
+
+          const userProjectsSnapShot = await getDocs(userProjectsRefQuery);
+
+          const userProjectsMiscContributers: allProjectContributerType[][] =
+            userProjectsSnapShot.docs.map((doc) => {
+              const project = doc.data();
+
+              const projectContributers = project.contributers;
+
+              const miscContributer: allProjectContributerType[] =
+                projectContributers.filter(
+                  (eachContributer: allProjectContributerType) => {
+                    return eachContributer.miscellaneous === true;
+                  }
+                );
+
+              return miscContributer;
+            });
+
+          const userAllProjectsMiscContributers =
+            userProjectsMiscContributers.flatMap((project) => {
+              return project;
+            });
+
+          const normalizeString = (str: string): string => {
+            return str.trim().toLowerCase().replace(/\s+/g, "");
+          };
+
+          const filteredDuplicateMiscbutersContri: allProjectContributerType[] =
+            userAllProjectsMiscContributers.filter((item, index, self) => {
+              const normalizeName = normalizeString(item.name);
+              const normalizeRole = normalizeString(item.miscellaneousRole);
+
+              const uniqueIdx = self.findIndex((each) => {
+                return (
+                  normalizeString(each.name) === normalizeName &&
+                  normalizeString(each.miscellaneousRole) === normalizeRole
+                );
+              });
+
+              return index === uniqueIdx;
+            });
+
+          const docRef = doc(db, "expense", id);
           const document = await getDoc(docRef);
 
           if (!document.exists()) {
@@ -141,6 +205,7 @@ export const getExpenseDetails = createAsyncThunk<
           resolve({
             expenseDetails: expenseDetails,
             projectOptions: userDetails.projects,
+            userAllProjectMiscContributers: filteredDuplicateMiscbutersContri,
           });
         } catch (err) {
           console.log(err);
@@ -175,7 +240,7 @@ export const editExpenseDetails = createAsyncThunk<
           }[] = [];
 
           const normalizeString = (str: string): string => {
-            return str.toLowerCase().replace(/\s+/g, "");
+            return str.trim().toLowerCase().replace(/\s+/g, "");
           };
 
           const findPaidToRoleName = (id: string) => {
@@ -230,10 +295,9 @@ export const editExpenseDetails = createAsyncThunk<
 
           //
 
-          // ----------------------Checking Contributer already exists----------------------------//
+          // ----------------------Checking Contributer already exists----------------------------/
 
           const projectDocRef = doc(db, "projects", editFormValue.projectId);
-
           const projectDoc = await getDoc(projectDocRef);
 
           const projectData = projectDoc.data();
@@ -254,6 +318,27 @@ export const editExpenseDetails = createAsyncThunk<
                     )
           );
 
+          const findMiscContributerId = () => {
+            const matchedMiscContributer =
+              state.editDeleteExpense.allProjectMiscContributer.filter(
+                (eachContributer) => {
+                  return (
+                    normalizeString(eachContributer.name) ===
+                      normalizeString(editFormValue.miscellaneuosPaidToName) &&
+                    normalizeString(eachContributer.miscellaneousRole) ===
+                      normalizeString(editFormValue.miscellaneousPaidToRole)
+                  );
+                }
+              );
+            if (
+              matchedMiscContributer.length > 0
+            ) {
+              return matchedMiscContributer[0].miscellaneousId;
+            } else  {
+              return uuidv4();
+            }
+          };
+
           if (contributerExists.length == 0) {
             if (state.editDeleteExpense.miscellaneuosInput) {
               contributerData = {
@@ -262,7 +347,7 @@ export const editExpenseDetails = createAsyncThunk<
                 miscellaneous: true,
                 miscellaneousRole:
                   editFormValue.miscellaneousPaidToRole as string,
-                miscellaneousId: uuidv4(),
+                miscellaneousId: findMiscContributerId(),
               };
             } else {
               contributerData = {
@@ -308,9 +393,8 @@ export const editExpenseDetails = createAsyncThunk<
             miscellaneuosPaidToName: state.editDeleteExpense.miscellaneuosInput
               ? editFormValue.miscellaneuosPaidToName
               : "",
-            billImage: editFormValue.billImage?editFormValue.billImage:"",
+            billImage: editFormValue.billImage ? editFormValue.billImage : "",
           };
-
 
           const expenseDocRef = doc(
             db,
@@ -441,6 +525,9 @@ const editDeleteExpenseSlice = createSlice({
         dailyExpenseOrNot: boolean;
       }>
     ) => {
+      if (action.payload.open === false) {
+        state.allProjectMiscContributer = [];
+      }
       state.editDrawerOpen = action.payload.open;
       state.expenseId = action.payload.id;
       state.dailyExpense = action.payload.dailyExpenseOrNot;
@@ -455,12 +542,12 @@ const editDeleteExpenseSlice = createSlice({
     setEditExpenseMiscellaneousInput: (state, action) => {
       state.miscellaneuosInput = action.payload;
     },
-    setEditFuncLoad: (state, action:PayloadAction<boolean>) => {
+    setEditFuncLoad: (state, action: PayloadAction<boolean>) => {
       state.editFuncLoad = action.payload;
     },
-    setExpenseBillImage:(state,action:PayloadAction<string>)=>{
-    state.expenseInfo.billImage=action.payload;
-    }
+    setExpenseBillImage: (state, action: PayloadAction<string>) => {
+      state.expenseInfo.billImage = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getExpenseDetails.pending, (state, _action) => {
@@ -468,8 +555,9 @@ const editDeleteExpenseSlice = createSlice({
     });
 
     builder.addCase(getExpenseDetails.fulfilled, (state, action) => {
+      state.allProjectMiscContributer =
+        action.payload.userAllProjectMiscContributers;
       state.miscellaneuosInput = action.payload.expenseDetails.miscellaneous;
-
       state.currrentProject = action.payload.projectOptions.filter(
         (p) => p.id === action.payload.expenseDetails.projectId
       )[0];
@@ -489,9 +577,8 @@ const editDeleteExpenseSlice = createSlice({
 
     builder.addCase(editExpenseDetails.fulfilled, (state, action) => {
       state.expenseInfo = action.payload.editedExpense;
+      state.allProjectMiscContributer = [];
       toast.success("Expense Edited successfully");
-      // state.editFuncLoad = false;
-      // state.editDrawerOpen = false;
     });
 
     builder.addCase(editExpenseDetails.rejected, (state, action) => {
@@ -526,5 +613,5 @@ export const {
   setDeleteConformationDrawerOpen,
   setEditExpenseMiscellaneousInput,
   setEditFuncLoad,
-  setExpenseBillImage
+  setExpenseBillImage,
 } = editDeleteExpenseSlice.actions;

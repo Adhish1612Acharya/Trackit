@@ -9,7 +9,7 @@ import {
 import addProjectFormSchema from "@/validations/forms/AddProjectForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addProject } from "@/store/features/DailyExpense";
+import { addProject, setOpenAddProjectDrawer } from "@/store/features/DailyExpense";
 import { z } from "zod";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
@@ -20,15 +20,16 @@ import { Loader2 } from "lucide-react";
 
 interface addProjectFormProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
+  addProjectBtnLoad:boolean;
 }
 
-const AddProjectForm: FC<addProjectFormProps> = ({ dispatch }) => {
+const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad }) => {
   const form = useForm<z.infer<typeof addProjectFormSchema>>({
     resolver: zodResolver(addProjectFormSchema),
     defaultValues: {
       title: "",
       description: "",
-      budget: undefined,
+      budget:"",
     },
   });
 
@@ -36,6 +37,7 @@ const AddProjectForm: FC<addProjectFormProps> = ({ dispatch }) => {
     formValue: z.infer<typeof addProjectFormSchema>
   ) => {
     dispatch(addProject(formValue)).then(() => form.reset());
+       dispatch(setOpenAddProjectDrawer(true));
   };
 
   return (
@@ -92,21 +94,18 @@ const AddProjectForm: FC<addProjectFormProps> = ({ dispatch }) => {
           )}
         />
 
-        {useAppSelector((state) => state.addDailyExpense.addProjectBtnLoad) ? (
+        {addProjectBtnLoad ? (
           <Button style={{ marginTop: 20, width: "100%" }} disabled>
             <Loader2 className="animate-spin" />
             Please wait
           </Button>
         ) : (
           <Button
-            // variant="contained"
+          
             color="primary"
-            // fullWidth
+           
             type="submit"
             style={{ marginTop: 20, width: "100%" }}
-            // disabled={useAppSelector(
-            //   (state) => state.addDailyExpense.addExpenseBtnLoad
-            // )}
           >
             Create Project
           </Button>
