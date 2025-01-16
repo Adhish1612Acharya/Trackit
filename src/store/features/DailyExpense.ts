@@ -18,8 +18,8 @@ import { RootState } from "../store";
 import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
 import { v4 as uuidv4 } from "uuid";
-import { Console } from "node:console";
 import { allProjectContributerType } from "./EditDeleteExpense";
+import { contributersType } from "./GetProjects";
 
 interface GetUserDailyExpenseResponse {
   userData: any; // Replace `any` with the proper type of your user data if known
@@ -55,7 +55,7 @@ export interface expenseType {
   miscellaneuosPaidToId: string;
   miscellaneuosPaidToName: string;
   billImage: string;
-  owner:string;
+  owner: string;
 }
 
 export interface filterValueType {
@@ -285,20 +285,18 @@ export const addDailyExpense = createAsyncThunk<
 
           const findMiscContributerId = () => {
             const matchedMiscContributer =
-             filteredDuplicateMiscbutersContri.filter(
-                (eachContributer) => {
-                  return (
-                    normalizeString(eachContributer.name) ===
-                      normalizeString(value.miscellaneousPaidToName) &&
-                    normalizeString(eachContributer.miscellaneousRole) ===
-                      normalizeString(value.miscellaneousPaidToRole)
-                  );
-                }
-              );
+              filteredDuplicateMiscbutersContri.filter((eachContributer) => {
+                return (
+                  normalizeString(eachContributer.name) ===
+                    normalizeString(value.miscellaneousPaidToName) &&
+                  normalizeString(eachContributer.miscellaneousRole) ===
+                    normalizeString(value.miscellaneousPaidToRole)
+                );
+              });
             if (matchedMiscContributer.length > 0) {
               return matchedMiscContributer[0].miscellaneousId;
             } else {
-              const id=uuidv4();
+              const id = uuidv4();
               return id;
             }
           };
@@ -345,7 +343,7 @@ export const addDailyExpense = createAsyncThunk<
 
           const paymentModeName = findPaymentModeName(value.paymentMode);
 
-          const miscellaneousId=findMiscContributerId();
+          const miscellaneousId = findMiscContributerId();
 
           const expenseDocumentData: any = {
             date: new Date(value.date),
@@ -358,7 +356,7 @@ export const addDailyExpense = createAsyncThunk<
             projectId: value.project,
             projectTitle: projectName[0].name,
             miscellaneous: state.addDailyExpense.miscellaneousInput,
-            miscellaneuosPaidToId:miscellaneousId,
+            miscellaneuosPaidToId: miscellaneousId,
             //  state.addDailyExpense.miscellaneousInput
             //   ? contributerExists.length == 0
             //     ? uuidv4()
@@ -438,7 +436,7 @@ export const addDailyExpense = createAsyncThunk<
 
           expenseDocumentData.date = formattedExpDocDate;
 
-          expenseDocumentData.expenseId=newExpense.id;
+          expenseDocumentData.expenseId = newExpense.id;
 
           resolve({
             expenseId: newExpense.id,
@@ -457,9 +455,27 @@ export const addDailyExpense = createAsyncThunk<
   });
 });
 
-interface addProjectResponse {
+interface project {
+id:string,
+  title: string;
+  description: string;
+  image: string;
+  budget: number;
+  expenses: any[]; // Replace `any` with a more specific type if you know the structure of each expense
+  owner: string;
+  contributers: contributersType[];
+}
+
+
+interface newProject {
+  id: string;
+  name: string;
+  newProjectData: project;
+}
+
+export interface addProjectResponse {
   message: string;
-  newProject: any;
+  newProject: newProject;
 }
 
 export const addProject = createAsyncThunk<
@@ -471,7 +487,7 @@ export const addProject = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          const projectFormDocument = {
+          const projectFormDocument:any = {
             title: value.title,
             description: value.description,
             image: "",
@@ -495,9 +511,15 @@ export const addProject = createAsyncThunk<
             addProjectOptions({ id: addedProject.id, name: value.title })
           );
 
+          projectFormDocument.id=addedProject.id
+
           resolve({
             message: "Project Added",
-            newProject: { id: addedProject.id, name: value.title },
+            newProject: {
+              id: addedProject.id,
+              name: value.title,
+              newProjectData: projectFormDocument,
+            },
           });
         } catch (error) {
           console.error("Error fetching user data:", error);
@@ -743,10 +765,6 @@ const dailyExpenseSlice = createSlice({
       state.openFilterDrawer = false;
       toast.error("Some Error Occured");
     });
-
-    // builder.addCase(getUserProjects.fulfilled, (state, action) => {
-    //   state.filterProjects = action.payload;
-    // });
   },
 });
 

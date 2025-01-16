@@ -14,7 +14,7 @@ import {
 import { toast } from "react-toastify";
 import { RootState } from "../store";
 
-interface contributersType {
+export interface contributersType {
   id: string;
   name: string;
   miscellaneousRole: string;
@@ -26,7 +26,7 @@ interface projectsType {
   id: string;
   title: string;
   description: string;
-  budget: string;
+  budget: number;
   contributers: contributersType[];
   expenses: string[];
   image: string;
@@ -173,6 +173,10 @@ const getProjectsSlice = createSlice({
     },
     setAddProjectBtnLoad:(state,action:PayloadAction<boolean>)=>{
       state.addProjectBtnLoad=action.payload;
+    },
+    setNewProject:(state,action:PayloadAction< projectsType>)=>{
+        state.projects.push(action.payload);
+        state.addProjectBtnLoad=false;  
     }
   },
   extraReducers: (builder) => {
@@ -215,5 +219,5 @@ const getProjectsSlice = createSlice({
 
 export default getProjectsSlice.reducer;
 
-export const { setProjectDeleteAlertOpen, setDeleteProjectId,setOpenAddProjectDrawer,setAddProjectBtnLoad } =
+export const {setNewProject, setProjectDeleteAlertOpen, setDeleteProjectId,setOpenAddProjectDrawer,setAddProjectBtnLoad } =
   getProjectsSlice.actions;

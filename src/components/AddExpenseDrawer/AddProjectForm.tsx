@@ -9,23 +9,25 @@ import {
 import addProjectFormSchema from "@/validations/forms/AddProjectForm";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { addProject, setOpenAddProjectDrawer as dailyExpenseAddProjectDrawer } from "@/store/features/DailyExpense";
+import { addProject, addProjectResponse, setOpenAddProjectDrawer as dailyExpenseAddProjectDrawer } from "@/store/features/DailyExpense";
 import { z } from "zod";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { RootState } from "@/store/store";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { useAppSelector } from "@/store/store";
 import { Loader2 } from "lucide-react";
-import { setOpenAddProjectDrawer } from "@/store/features/GetProjects";
+import { setAddProjectBtnLoad, setNewProject, setOpenAddProjectDrawer } from "@/store/features/GetProjects";
+import { NavigateFunction } from "react-router-dom";
 
 interface addProjectFormProps {
   dispatch: ThunkDispatch<RootState, undefined, Action>;
   addProjectBtnLoad:boolean;
   isDailyExpensePage:boolean;
+  isAddProjectPage?:boolean;
+  navigate?:NavigateFunction
 }
 
-const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad, isDailyExpensePage }) => {
+const AddProjectForm: FC<addProjectFormProps> = ({ dispatch,navigate, addProjectBtnLoad, isDailyExpensePage,isAddProjectPage }) => {
   const form = useForm<z.infer<typeof addProjectFormSchema>>({
     resolver: zodResolver(addProjectFormSchema),
     defaultValues: {
@@ -35,35 +37,47 @@ const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad, 
     },
   });
 
-  const handleFormSubmit = (
+  const handleFormSubmit =async  (
     formValue: z.infer<typeof addProjectFormSchema>
   ) => {
 
-    dispatch(addProject(formValue)).then(() => form.reset());
-    if(isDailyExpensePage){
-      dispatch(dailyExpenseAddProjectDrawer(true));
-    }else{
-      dispatch(setOpenAddProjectDrawer(false));
+    if(!isDailyExpensePage && !isAddProjectPage){
+      dispatch(setAddProjectBtnLoad(true));
     }
+    const response=await dispatch(addProject(formValue));
+    form.reset();
+
+    if(isAddProjectPage && navigate){
+      navigate(`/u/projects/${(response.payload as addProjectResponse)?.newProject.id}`)
+    }else{
+      if(isDailyExpensePage){
+        dispatch(dailyExpenseAddProjectDrawer(true));
+      }else{
+        const newProjectResponse=(response.payload as addProjectResponse).newProject?.newProjectData;
+        dispatch(setNewProject(newProjectResponse));
+        dispatch(setOpenAddProjectDrawer(false));
+      }
+    }
+
+    
+   
        
   };
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleFormSubmit)}
-        className="space-y-8"
-      >
+       <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Title</FormLabel>
+              <FormLabel className="text-gray-700">Title</FormLabel>
               <Input
-                placeholder="Enter the Title of the project"
+                placeholder="Enter the title of the project"
                 type="text"
                 {...field}
+                className="border rounded-md px-3 py-2"
               />
               <FormMessage />
             </FormItem>
@@ -75,11 +89,11 @@ const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad, 
           name="description"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Description</FormLabel>
-              <Input
+              <FormLabel className="text-gray-700">Description</FormLabel>
+              <textarea
                 placeholder="Enter the description of the project"
-                type="text"
                 {...field}
+                className="border rounded-md px-3 py-2 h-24"
               />
               <FormMessage />
             </FormItem>
@@ -91,33 +105,36 @@ const AddProjectForm: FC<addProjectFormProps> = ({ dispatch, addProjectBtnLoad, 
           name="budget"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Budget</FormLabel>
+              <FormLabel className="text-gray-700">Budget</FormLabel>
               <Input
-                placeholder="Enter the image of the project"
+                placeholder="Enter the budget for the project"
                 type="number"
                 {...field}
+                className="border rounded-md px-3 py-2"
               />
               <FormMessage />
             </FormItem>
           )}
         />
 
-        {addProjectBtnLoad ? (
-          <Button style={{ marginTop: 20, width: "100%" }} disabled>
-            <Loader2 className="animate-spin" />
-            Please wait
-          </Button>
-        ) : (
-          <Button
-          
-            color="primary"
-           
-            type="submit"
-            style={{ marginTop: 20, width: "100%" }}
-          >
-            Create Project
-          </Button>
-        )}
+        <div className="pt-4">
+          {addProjectBtnLoad ? (
+            <Button
+              className="w-full text-white px-4 py-2 rounded-md flex items-center justify-center"
+              disabled
+            >
+              <Loader2 className="animate-spin mr-2" />
+              Creating...
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className="w-full  text-white px-4 py-2 rounded-md"
+            >
+              Create Project
+            </Button>
+          )}
+        </div>
       </form>
     </Form>
   );

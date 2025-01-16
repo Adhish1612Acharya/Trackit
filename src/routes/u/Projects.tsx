@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/store/store";
 import { Fab, Skeleton } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AddIcon from "@mui/icons-material/Add";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const Projects = () => {
                 id={project.id}
                 title={project.title}
                 description={project.description}
-                budget={project.budget}
+                budget={String(project.budget)}
                 navigate={navigate}
                 dispatch={dispatch}
               />
@@ -85,7 +85,7 @@ const Projects = () => {
         }}
         onClick={() => dispatch(setOpenAddProjectDrawer(true))}
       >
-        <AddIcon />
+        <CreateNewFolderIcon />
       </Fab>
       <ConformationAlertDialog
         openAlertDialog={openDeleteAlertDialog}

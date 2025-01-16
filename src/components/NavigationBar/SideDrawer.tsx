@@ -7,7 +7,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import HomeIcon from "@mui/icons-material/Home";
-import AddIcon from "@mui/icons-material/Add";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -53,9 +53,9 @@ const SideDrawer: React.FC<props> = ({ open, setOpen }) => {
       link: "/u/home",
     },
     {
-      title: "Add Expense",
-      icon: <AddIcon />,
-      link: "/u/daily-expense",
+      title: "Add Project",
+      icon:<CreateNewFolderIcon  />,
+      link: "/u/projects/add",
     },
     {
       title: "Today's Expense",

@@ -15,6 +15,7 @@ import DailyExpense from "./routes/u/DailyExpense";
 import Projects from "./routes/u/Projects";
 import ProjectExpense from "./routes/u/ProjectExpense";
 import { LoginProviderContext, useLogin } from "./Context/LoginProviderContext";
+import AddProjectPage from "./routes/u/AddProjectPage/AddProjectPage";
 
 const App = () => {
   return (
@@ -58,6 +59,7 @@ const AppContent = () => {
           <Route path="/u/daily-expense" element={<DailyExpense />} />
           <Route path="/u/projects" element={<Projects />} />
           <Route path="/u/projects/:id" element={<ProjectExpense />} />
+          <Route path="/u/projects/add" element={<AddProjectPage/>}/>
         </Route>
       </Routes>
     </>

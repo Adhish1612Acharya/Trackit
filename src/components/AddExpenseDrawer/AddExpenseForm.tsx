@@ -22,7 +22,6 @@ import { RootState } from "@/store/store";
 import {
   addDailyExpense,
   addDailyExpenseResponse,
-  addProject,
   expenseType,
   formValueType,
   getUserDailyExpense,

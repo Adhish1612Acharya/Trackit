@@ -12,7 +12,7 @@ import SideDrawer from "./SideDrawer";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
-import AddIcon from "@mui/icons-material/Add";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
 
 const pages = [
   {
@@ -21,9 +21,9 @@ const pages = [
     link: "/u/home",
   },
   {
-    title: "Add Expense",
-    icon: <AddIcon />,
-    link: "/u/daily-expense",
+    title: "Add Project",
+    icon: <CreateNewFolderIcon  />,
+    link: "/u/projects/add",
   },
 ];
 
