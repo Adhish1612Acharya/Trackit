@@ -28,8 +28,6 @@ import {
   projectOptionsType,
   setAddExpenseLoad,
   setMiscellaneousInput,
-  setOpenAddExpenseDrawer,
-  setOpenAddProjectDrawer,
 } from "@/store/features/DailyExpense";
 import constructionRoles from "@/filterData/contructionRolesData";
 import paymentTypes from "@/filterData/paymentFilters";
@@ -46,7 +44,7 @@ import {
   addProjectExpense,
   getUserProjectExpense,
 } from "@/store/features/ProjectDetails";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2} from "lucide-react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
