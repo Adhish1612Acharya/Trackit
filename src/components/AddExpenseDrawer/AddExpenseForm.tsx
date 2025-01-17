@@ -425,7 +425,6 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                         <VisuallyHiddenInput
                           accept="image/png, image/jpeg"
                           type="file"
-                          multiple
                           onChange={(event) => {
                             const files = event.target.files;
                             const file = files && files[0] ? files[0] : "";
