@@ -153,7 +153,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
       try {
         const res = await fetch(uploadUrl, options);
         const data = await res.json();
-        return data.url; // Make sure the URL is returned
+        return data.secure_url; // Make sure the URL is returned
       } catch (err: any) {
         console.error("Upload Failed:", err);
         throw new Error("Cloudinary Error " + err.message);
