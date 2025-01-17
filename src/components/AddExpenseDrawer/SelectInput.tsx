@@ -61,11 +61,12 @@ const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
           </SelectTrigger>
           <SelectContent
             style={{
-             overflowY:"scroll",
-              zIndex: 1301, // Higher than Material-UI's Dialog z-index (1300)
+              maxHeight: "250px", 
+              overflowY: "auto", 
+              zIndex: 1301,
             }}
             
-            side={"top"}
+            // side={"top"}
             
           >
             <SelectGroup  >

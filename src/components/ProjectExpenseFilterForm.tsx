@@ -33,8 +33,8 @@ const ProjectExpenseFilterForm: FC<filterFormProps> = ({
   const form = useForm<z.infer<typeof projectExpenseFilterSearchScheme>>({
     resolver: zodResolver(projectExpenseFilterSearchScheme),
     defaultValues: {
-      paidToId: "52",
-      paymentModeId: "51",
+      paidToId: "-1",
+      paymentModeId: "-1",
       date: undefined,
     },
   });

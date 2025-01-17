@@ -175,10 +175,10 @@ export const projectDetailsApplyFilter = createAsyncThunk<
         try {
           const filterValue = value.filterValue;
           const formattedFilterData: any = {
-            ...(filterValue.paidToId !== "52" && {
+            ...(filterValue.paidToId !== "-1" && {
               paidToId: filterValue.paidToId,
             }),
-            ...(filterValue.paymentModeId !== "51" && {
+            ...(filterValue.paymentModeId !== "-1" && {
               paymentModeId: filterValue.paymentModeId,
             }),
           };

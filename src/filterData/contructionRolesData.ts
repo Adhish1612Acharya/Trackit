@@ -49,6 +49,7 @@ const constructionRoles = [
   { id: 48, name: "Crane Operator" },
   { id: 49, name: "Survey Technician" },
   { id: 50, name: "Solar Panel Installer" },
+  {id:52,name:"Bank Loan"},
   { id: 51, name: "Miscellaneous" },
 ];
 
@@ -103,8 +104,9 @@ export const constructionRolesFilterSearch = [
   { id: 48, name: "Crane Operator" },
   { id: 49, name: "Survey Technician" },
   { id: 50, name: "Solar Panel Installer" },
+   {id:52,name:"Bank Loan"},
   { id: 51, name: "Miscellaneous" },
-  { id: 52, name: "All" },
+  { id: -1, name: "All" },
 ];
 
 export default constructionRoles;

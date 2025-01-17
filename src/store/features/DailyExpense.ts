@@ -548,10 +548,10 @@ export const applyFilter = createAsyncThunk<
       if (user) {
         try {
           const formattedFilterData: any = {
-            ...(filterValue.paidToId !== "52" && {
+            ...(filterValue.paidToId !== "-1" && {
               paidToId: filterValue.paidToId,
             }),
-            ...(filterValue.paymentModeId !== "51" && {
+            ...(filterValue.paymentModeId !== "-1" && {
               paymentModeId: filterValue.paymentModeId,
             }),
             ...(filterValue.projectId !== "-1" && {

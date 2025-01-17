@@ -33,8 +33,8 @@ const FilterForm: FC<filterFormProps> = ({ dispatch, projectOptions }) => {
   const form = useForm<z.infer<typeof filterSearchScheme>>({
     resolver: zodResolver(filterSearchScheme),
     defaultValues: {
-      paidToId: "52",
-      paymentModeId: "51",
+      paidToId: "-1",
+      paymentModeId: "-1",
       projectId: "-1",
     },
   });

@@ -644,7 +644,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                 </FormItem>
               )}
             />
-            {!editForm && isDailyExpense && (
+            {/* {!editForm && isDailyExpense && (
               <Button
                 variant="outline"
                 size="icon"
@@ -659,7 +659,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
               >
                 <Plus /> Add Project
               </Button>
-            )}
+            )} */}
           </div>
 
           <div
