@@ -25,17 +25,19 @@ type selectInputProps = {
   form: UseFormReturn<any>;
   setMiscelleneousInput?: (value: boolean) => void;
   filterSelect?: boolean;
+  disabled?:boolean;
 };
 
 // Forward ref in the SelectInput component
 const SelectInput = forwardRef<HTMLDivElement, selectInputProps>(
   (props, ref) => {
-    const { options, title, field, setMiscelleneousInput, form, filterSelect } =
+    const { options, title, field, setMiscelleneousInput, form, filterSelect,disabled } =
       props;
 
     return (
       <div ref={ref}>
         <Select
+        disabled={disabled}
       defaultValue={options.length===1 ?String(options[0].id):undefined}
           name={title}
           value={options.length===1?form.setValue(title,options[0].id):form.getValues(field.name)}

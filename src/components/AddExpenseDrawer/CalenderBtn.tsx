@@ -14,9 +14,10 @@ import "../../style/global.css";
 
 type CalenderBtnProps = {
   field: any;
+  disabled?:boolean;
 };
 
-const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
+const CalenderBtn: FC<CalenderBtnProps> = ({ field,disabled }) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -27,6 +28,7 @@ const CalenderBtn: FC<CalenderBtnProps> = ({ field }) => {
               " pl-3 text-left font-normal",
               !field.value && "text-muted-foreground"
             )}
+            disabled={disabled}
           >
             {field.value ? (
               format(field.value, "PPP")

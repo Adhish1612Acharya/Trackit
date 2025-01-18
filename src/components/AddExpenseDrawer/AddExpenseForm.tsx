@@ -370,7 +370,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   {/* Flex to share space */}
                   <div className="flex flex-col justify-end space-y-2">
                     <FormLabel className="mr-3">Date</FormLabel>
-                    <CalenderBtn field={field} />
+                    <CalenderBtn disabled={loading} field={field} />
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -454,6 +454,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                       <Input
                         placeholder="Enter The reason for payment"
                         {...field}
+                        disabled={loading}
                       />
                     </FormControl>
                     <FormMessage />
@@ -476,6 +477,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                       type="number"
                       placeholder="Enter Amount"
                       {...field}
+                      disabled={loading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -517,6 +519,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                           ? dispatch(setEditExpenseMiscellaneousInput(value))
                           : dispatch(setMiscellaneousInput(value))
                       }
+                      disabled={loading}
                       form={form}
                     />
                   </FormControl>
@@ -539,6 +542,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                       title="Payment Mode"
                       {...field}
                       form={form}
+                     disabled={loading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -567,6 +571,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     <FormLabel>Miscellaneous Name</FormLabel>
                     <FormControl>
                       <Input
+                      disabled={loading}
                         onInput={(e) => {
                           const input = e.target as HTMLInputElement;;
                           input.value = input.value
@@ -590,6 +595,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     <FormLabel>Miscellaneous Role</FormLabel>
                     <FormControl>
                       <Input 
+                      disabled={loading}
                        onInput={(e) => {
                         const input = e.target as HTMLInputElement;;
                         input.value = input.value
@@ -629,6 +635,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   <FormLabel>Project</FormLabel>
                   <FormControl>
                     <SelectInput
+                    disabled={loading}
                       field={field}
                       options={projectOptions}
                       project={true}
