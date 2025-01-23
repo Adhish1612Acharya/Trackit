@@ -44,7 +44,7 @@ import {
   addProjectExpense,
   getUserProjectExpense,
 } from "@/store/features/ProjectDetails";
-import { Loader2} from "lucide-react";
+import { Loader2 } from "lucide-react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -166,72 +166,79 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
 
     if (!file) return;
 
-    if (file.type === "application/pdf") return;
-
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async (e) => {
       const correctedImage = e.target?.result as string;
 
-      // Create a new PDF document
-      const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([600, 800]); // Define page size
-
-      // Embed the image into the PDF
-      const imageBytes = await fetch(correctedImage).then((res) =>
-        res.arrayBuffer()
-      );
-      let embeddedImage;
-      if (file.type === "image/png") {
-        embeddedImage = await pdfDoc.embedPng(imageBytes);
-      } else {
-        embeddedImage = await pdfDoc.embedJpg(imageBytes);
-      }
-
-      if (embeddedImage) {
-        const { width, height } = embeddedImage;
-
-        const pageWidth = 600; // PDF page width
-        const pageHeight = 800; // PDF page height
-
-        const marginLeft = 50; // Gap from the left
-        const marginTop = 50; // Gap from the top
-
-        // Calculate the available space for the image within the page
-        const availableWidth = pageWidth - marginLeft * 2;
-        const availableHeight = pageHeight - marginTop * 2;
-
-        // Calculate the scale factor to fit the image within the available space
-        const scale = Math.min(
-          availableWidth / width,
-          availableHeight / height
-        );
-
-        // Scale the image dimensions
-        const scaledWidth = width * scale;
-        const scaledHeight = height * scale;
-
-        // Calculate the position to center the image with margins
-        const x = marginLeft + (availableWidth - scaledWidth) / 2; // Center horizontally with margin
-        const y = marginTop + (availableHeight - scaledHeight) / 2; // Center vertically with margin
-
-        // Draw the scaled and centered image on the page
-        page.drawImage(embeddedImage, {
-          x: x,
-          y: y,
-          width: scaledWidth,
-          height: scaledHeight,
-        });
-
-        // Save the PDF
-        const pdfBytes = await pdfDoc.save();
-
+      if (file.type === "application/pdf") {
         // Convert pdfBytes to a Blob
-        const createdPdfBlob = new Blob([pdfBytes], {
+        const createdPdfBlob = new Blob([file], {
           type: "application/pdf",
         });
 
         setPdfBlob(createdPdfBlob);
+      } else {
+        // Create a new PDF document
+        const pdfDoc = await PDFDocument.create();
+        const page = pdfDoc.addPage([600, 800]); // Define page size
+
+        // Embed the image into the PDF
+        const imageBytes = await fetch(correctedImage).then((res) =>
+          res.arrayBuffer()
+        );
+        let embeddedImage;
+        if (file.type === "image/png") {
+          embeddedImage = await pdfDoc.embedPng(imageBytes);
+        } else {
+          embeddedImage = await pdfDoc.embedJpg(imageBytes);
+        }
+
+        if (embeddedImage) {
+          const { width, height } = embeddedImage;
+
+          const pageWidth = 600; // PDF page width
+          const pageHeight = 800; // PDF page height
+
+          const marginLeft = 50; // Gap from the left
+          const marginTop = 50; // Gap from the top
+
+          // Calculate the available space for the image within the page
+          const availableWidth = pageWidth - marginLeft * 2;
+          const availableHeight = pageHeight - marginTop * 2;
+
+          // Calculate the scale factor to fit the image within the available space
+          const scale = Math.min(
+            availableWidth / width,
+            availableHeight / height
+          );
+
+          // Scale the image dimensions
+          const scaledWidth = width * scale;
+          const scaledHeight = height * scale;
+
+          // Calculate the position to center the image with margins
+          const x = marginLeft + (availableWidth - scaledWidth) / 2; // Center horizontally with margin
+          const y = marginTop + (availableHeight - scaledHeight) / 2; // Center vertically with margin
+
+          // Draw the scaled and centered image on the page
+          page.drawImage(embeddedImage, {
+            x: x,
+            y: y,
+            width: scaledWidth,
+            height: scaledHeight,
+          });
+
+          // Save the PDF
+          const pdfBytes = await pdfDoc.save();
+
+          // Convert pdfBytes to a Blob
+          const createdPdfBlob = new Blob([pdfBytes], {
+            type: "application/pdf",
+          });
+
+          setPdfBlob(createdPdfBlob);
+        }
       }
     };
   };
@@ -304,7 +311,6 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
       setPdfBlob(undefined);
       dispatch(setEditExpenseMiscellaneousInput(false));
     } else {
-
       const newExpense: formValueType = {
         date: formData.date.toISOString(),
         amount: formData.amount,
@@ -423,7 +429,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                       >
                         Upload
                         <VisuallyHiddenInput
-                          accept="image/png, image/jpeg"
+                          accept="image/png, image/jpeg ,  application/pdf"
                           type="file"
                           onChange={(event) => {
                             const files = event.target.files;
@@ -542,7 +548,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                       title="Payment Mode"
                       {...field}
                       form={form}
-                     disabled={loading}
+                      disabled={loading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -571,9 +577,9 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                     <FormLabel>Miscellaneous Name</FormLabel>
                     <FormControl>
                       <Input
-                      disabled={loading}
+                        disabled={loading}
                         onInput={(e) => {
-                          const input = e.target as HTMLInputElement;;
+                          const input = e.target as HTMLInputElement;
                           input.value = input.value
                             .toLowerCase()
                             .replace(/\s+/g, "");
@@ -594,16 +600,18 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   <FormItem style={{ width: "50%" }}>
                     <FormLabel>Miscellaneous Role</FormLabel>
                     <FormControl>
-                      <Input 
-                      disabled={loading}
-                       onInput={(e) => {
-                        const input = e.target as HTMLInputElement;;
-                        input.value = input.value
-                          .toLowerCase()
-                          .replace(/\s+/g, "");
-                        field.onChange(input.value); // Update form state
-                      }}
-                      placeholder="Enter the role" {...field} />
+                      <Input
+                        disabled={loading}
+                        onInput={(e) => {
+                          const input = e.target as HTMLInputElement;
+                          input.value = input.value
+                            .toLowerCase()
+                            .replace(/\s+/g, "");
+                          field.onChange(input.value); // Update form state
+                        }}
+                        placeholder="Enter the role"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -635,7 +643,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   <FormLabel>Project</FormLabel>
                   <FormControl>
                     <SelectInput
-                    disabled={loading}
+                      disabled={loading}
                       field={field}
                       options={projectOptions}
                       project={true}
