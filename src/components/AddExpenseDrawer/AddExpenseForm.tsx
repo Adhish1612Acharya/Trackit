@@ -85,6 +85,8 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   isProjectPage,
 }) => {
   const [pdfBlob, setPdfBlob] = useState<Blob | undefined>(undefined);
+  const [convertPdfLoad,setConvertPdfLoad]=useState<boolean>(false);
+  const [openPdfLoad,setOpenPdfLoad]=useState<boolean>(false);
 
   const form = useForm<z.infer<typeof addExpenseFormSchema>>({
     resolver: zodResolver(addExpenseFormSchema),
@@ -162,6 +164,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   };
 
   const convertToPDF = () => {
+    setConvertPdfLoad(true);
     const file = form.getValues("file");
 
     if (!file) return;
@@ -178,6 +181,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
         });
 
         setPdfBlob(createdPdfBlob);
+        setConvertPdfLoad(false);
       } else {
         // Create a new PDF document
         const pdfDoc = await PDFDocument.create();
@@ -238,18 +242,24 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
           });
 
           setPdfBlob(createdPdfBlob);
+          setConvertPdfLoad(false);
         }
       }
     };
   };
 
   const openWindow = () => {
+   
     if (pdfBlob) {
+      setOpenPdfLoad(true);
       // Open the PDF in a new tab
       window.open(URL.createObjectURL(pdfBlob), "_blank");
+      setOpenPdfLoad(false);
     } else if (editForm) {
       if (expense?.billImage && expense?.billImage !== "") {
+        setOpenPdfLoad(true);
         window.open(expense?.billImage, "_blank");
+        setOpenPdfLoad(false);
       }
     }
   };
@@ -391,6 +401,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                   <div className="w-full flex items-center">
                     <FileUploadBtn
                       id="fileInput"
+                      color="success"
                       component="label"
                       role={undefined}
                       variant="contained"
@@ -398,8 +409,9 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                       startIcon={<PictureAsPdfIcon />}
                       className="h-9 w-full"
                       onClick={() => openWindow()}
+                      disabled={openPdfLoad}
                     >
-                      View
+                      {openPdfLoad?"Loading...":"View"}
                     </FileUploadBtn>
                     <DeleteIcon
                       className="ml-2 cursor-pointer w-1/2 text-red-500"
@@ -426,8 +438,9 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                         tabIndex={-1}
                         startIcon={<CloudUploadIcon />}
                         className="h-9 w-full"
+                        disabled={convertPdfLoad}
                       >
-                        Upload
+                        {convertPdfLoad?"Loading...":"Upload"}
                         <VisuallyHiddenInput
                           accept="image/png, image/jpeg ,  application/pdf"
                           type="file"
@@ -436,6 +449,7 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
                             const file = files && files[0] ? files[0] : "";
                             field.onChange(file);
                             if (file) {
+                              
                               convertToPDF();
                             }
                           }}

@@ -161,7 +161,7 @@ export const getUserDailyExpense = createAsyncThunk<
             where("owner", "==", user.uid),
             where("date", ">=", startTimestamp),
             where("date", "<=", endTimestamp),
-            orderBy("date", "asc")
+            orderBy("date", "desc")
           );
           const querySnapShot = await getDocs(userExpenseQuery);
 
@@ -576,7 +576,7 @@ export const applyFilter = createAsyncThunk<
             where("owner", "==", user.uid),
             where("date", ">=", startTimestamp),
             where("date", "<=", endTimestamp),
-            orderBy("date", "asc")
+            orderBy("date", "desc")
           );
 
           // Dynamically add filters from formattedFilterData

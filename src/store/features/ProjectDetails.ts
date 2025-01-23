@@ -79,7 +79,7 @@ export const getUserProjectExpense = createAsyncThunk<
             collection(db, "expense"),
             where("owner", "==", user.uid),
             where("projectId", "==", projectId),
-            orderBy("date", "asc")
+            orderBy("date", "desc")
           );
           const querySnapShot = await getDocs(userExpenseQuery);
 
@@ -197,14 +197,14 @@ export const projectDetailsApplyFilter = createAsyncThunk<
               where("projectId", "==", value.projectId),
               where("date", ">=", startTimestamp),
               where("date", "<=", endTimestamp),
-              orderBy("date", "asc")
+              orderBy("date", "desc")
             );
           } else {
             projectQueryExpense = query(
               collection(db, "expense"),
               where("owner", "==", user.uid),
               where("projectId", "==", value.projectId),
-              orderBy("date", "asc")
+              orderBy("date", "desc")
             );
           }
 
