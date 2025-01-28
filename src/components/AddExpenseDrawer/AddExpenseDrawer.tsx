@@ -1,27 +1,13 @@
 import { DialogContent } from "@mui/material";
-import AddExpenseForm from "./AddExpenseForm";
-import { Action, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState } from "@/store/store";
+import AddExpenseForm from "../AddExpenseForm/AddExpenseForm";
 import { FC } from "react";
-import {
-  projectOptionsType,
-  setOpenAddExpenseDrawer,
-} from "@/store/features/DailyExpense";
+import { setOpenAddExpenseDrawer } from "@/store/features/DailyExpense/DailyExpenseSlice";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
-
-export interface addExpenseDrawerProps {
-  dispatch: ThunkDispatch<RootState, undefined, Action>;
-  openDrawer: boolean;
-  projectOptions: projectOptionsType[];
-  loading: boolean;
-  miscellaneousInput: boolean;
-  isDailyExpense:boolean,
-  isProjectPage:boolean
-}
+import { addExpenseDrawerProps } from "./AddExpenseDrawerTypes";
 
 const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
   dispatch,
@@ -30,7 +16,7 @@ const AddExpenseDrawer: FC<addExpenseDrawerProps> = ({
   projectOptions,
   miscellaneousInput,
   isDailyExpense,
-  isProjectPage
+  isProjectPage,
 }) => {
   const theme = useTheme();
 

@@ -1,28 +1,13 @@
-import { expenseType, projectOptionsType } from "@/store/features/DailyExpense";
-import { RootState } from "@/store/store";
-import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { FC } from "react";
-import AddExpenseForm from "../AddExpenseDrawer/AddExpenseForm";
-import { setEditDrawerOpen } from "@/store/features/EditDeleteExpense";
+import AddExpenseForm from "../AddExpenseForm/AddExpenseForm";
+import { setEditDrawerOpen } from "@/store/features/EditDeleteExpense/EditDeleteExpenseSlice";
 import { CircularProgress, DialogContent } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-import CloseIcon from '@mui/icons-material/Close';
-
-interface EditDialogProps {
-  editDialogOpen: boolean;
-  dispatch: ThunkDispatch<RootState, undefined, Action>;
-  expense: expenseType;
-  editExpenseCurrentProject: { id: string; name: string };
-  projectOptions: projectOptionsType[];
-  editInfoLoad: boolean;
-  editFuncLoading: boolean;
-  miscellaneousInput:boolean;
-  isDailyExpense:boolean;
-  isProjectPage:boolean;
-}
+import CloseIcon from "@mui/icons-material/Close";
+import { EditDialogProps } from "./EditDialogTypes";
 
 const EditDialog: FC<EditDialogProps> = ({
   editDialogOpen,
@@ -34,7 +19,7 @@ const EditDialog: FC<EditDialogProps> = ({
   editFuncLoading,
   miscellaneousInput,
   isDailyExpense,
-  isProjectPage
+  isProjectPage,
 }) => {
   const theme = useTheme();
 
@@ -55,29 +40,46 @@ const EditDialog: FC<EditDialogProps> = ({
       }
       aria-labelledby="responsive-dialog-title"
     >
-      <DialogTitle id="responsive-dialog-title" style={{marginBottom:"0rem", display:"flex" , justifyContent:"space-between"}}>{"Edit Expense"} <CloseIcon style={{cursor:"pointer"}} onClick={()=>dispatch( setEditDrawerOpen({
-            id: "",
-            open: false,
-            dailyExpenseOrNot: false,
-          }))}/></DialogTitle>
-       <DialogContent>
-      <div className="grid gap-4 py-4">
-        {editInfoLoad ? (
-          <CircularProgress />
-        ) : (
-          <AddExpenseForm
-            dispatch={dispatch}
-            projectOptions={projectOptions}
-            expense={expense}
-            editForm={true}
-            editExpenseCurrentProject={editExpenseCurrentProject}
-            loading={editFuncLoading}
-            miscellaneousInput={miscellaneousInput}
-            isDailyExpense={isDailyExpense}
-            isProjectPage={isProjectPage}
-          />
-        )}
-      </div>
+      <DialogTitle
+        id="responsive-dialog-title"
+        style={{
+          marginBottom: "0rem",
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        {"Edit Expense"}{" "}
+        <CloseIcon
+          style={{ cursor: "pointer" }}
+          onClick={() =>
+            dispatch(
+              setEditDrawerOpen({
+                id: "",
+                open: false,
+                dailyExpenseOrNot: false,
+              })
+            )
+          }
+        />
+      </DialogTitle>
+      <DialogContent>
+        <div className="grid gap-4 py-4">
+          {editInfoLoad ? (
+            <CircularProgress />
+          ) : (
+            <AddExpenseForm
+              dispatch={dispatch}
+              projectOptions={projectOptions}
+              expense={expense}
+              editForm={true}
+              editExpenseCurrentProject={editExpenseCurrentProject}
+              loading={editFuncLoading}
+              miscellaneousInput={miscellaneousInput}
+              isDailyExpense={isDailyExpense}
+              isProjectPage={isProjectPage}
+            />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

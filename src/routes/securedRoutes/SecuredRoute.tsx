@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { Navigate, Outlet } from "react-router-dom";
-import { checkLogin } from "@/store/features/securedRoutes/SecureRoute";
-import { useLogin } from "@/Context/LoginProviderContext";
+import { useLogin } from "@/Context/LoginProviderContext/LoginProviderContext";
 import { CircularProgress } from "@mui/material";
+import checkLogin from "@/store/features/securedRoutes/Thunks/checkLogin/checkLogin";
 
 const SecuredRoute = () => {
   const dispatch = useAppDispatch();

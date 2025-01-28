@@ -1,20 +1,23 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import Home from "./routes/Home";
+import Home from "./routes/Home/Home";
 import { ThemeProvider } from "@emotion/react";
 import theme from "./theme";
 import "react-toastify/dist/ReactToastify.css";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import { ToastContainer } from "react-toastify";
-import SignUp from "./routes/SignUp";
-import OwnerHome from "./routes/u/Home";
+import SignUp from "./routes/SignUp/SignUp";
+import OwnerHome from "./routes/u/Home/Home";
 import SecuredRoute from "./routes/securedRoutes/SecuredRoute";
-import NavBar from "./components/NavigationBar/NavBar";
-import DailyExpense from "./routes/u/DailyExpense";
-import Projects from "./routes/u/Projects";
-import ProjectExpense from "./routes/u/ProjectExpense";
-import { LoginProviderContext, useLogin } from "./Context/LoginProviderContext";
+import NavBar from "./components/NavigationBar/NavBar/NavBar";
+import DailyExpense from "./routes/u/DailyExpense/DailyExpense";
+import Projects from "./routes/u/Projects/Projects";
+import ProjectExpense from "./routes/u/ProjectExpense/ProjectExpense";
+import {
+  LoginProviderContext,
+  useLogin,
+} from "./Context/LoginProviderContext/LoginProviderContext";
 import AddProjectPage from "./routes/u/AddProjectPage/AddProjectPage";
 
 const App = () => {
@@ -59,7 +62,7 @@ const AppContent = () => {
           <Route path="/u/daily-expense" element={<DailyExpense />} />
           <Route path="/u/projects" element={<Projects />} />
           <Route path="/u/projects/:id" element={<ProjectExpense />} />
-          <Route path="/u/projects/add" element={<AddProjectPage/>}/>
+          <Route path="/u/projects/add" element={<AddProjectPage />} />
         </Route>
       </Routes>
     </>

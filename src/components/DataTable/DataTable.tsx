@@ -2,28 +2,14 @@
 import { FC, useState } from "react";
 import "../../style/dataTable.css";
 import { Typography, Box, Button, Skeleton, Paper } from "@mui/material";
-import {
-  expenseType,
-  setOpenFilterDrawer,
-} from "@/store/features/DailyExpense";
-import ExpenseAccordian from "./ExpenseAccordian";
-import TableComponent from "./TableComponent";
+import { setOpenFilterDrawer } from "@/store/features/DailyExpense/DailyExpenseSlice";
+import ExpenseAccordian from "../ExpenseAccordian/ExpenseAccordian";
+import TableComponent from "../TableComponent/TableComponent";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Action, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState} from "@/store/store";
-import { setProjectDetailsOpenFilterDrawer } from "@/store/features/ProjectDetails";
+import { setProjectDetailsOpenFilterDrawer } from "@/store/features/ProjectDetails/ProjectDetailsSlice";
+import { DataTableProps } from "./DataTableTypes";
 
-interface dataTableProps {
-  expense: [] | expenseType[];
-  dispatch: ThunkDispatch<RootState, undefined, Action>;
-  projectExpense: boolean;
-  totalExpense: number;
-  dailyExpense: boolean;
-  projectName?: string;
-  dataTableLoader: boolean;
-}
-
-const DataTable: FC<dataTableProps> = ({
+const DataTable: FC<DataTableProps> = ({
   expense,
   dispatch,
   projectExpense,

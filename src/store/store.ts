@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import homeReducer from "./features/Home/Home";
-import securedRouteReducer from "./features/securedRoutes/SecureRoute";
-import dailyExpenseReducer from "./features/DailyExpense";
-import projectListDetailsReducer from "./features/GetProjects";
-import getProjectExpenseReducer from "./features/ProjectDetails";
-import editAndDeleteExpenseReducer from "./features/EditDeleteExpense";
+import homeReducer from "./features/Home/HomeSlice";
+import securedRouteReducer from "./features/securedRoutes/SecureRouteSlice";
+import dailyExpenseReducer from "./features/DailyExpense/DailyExpenseSlice";
+import projectListDetailsReducer from "./features/GetProjects/GetProjectsSlice";
+import getProjectExpenseReducer from "./features/ProjectDetails/ProjectDetailsSlice";
+import editAndDeleteExpenseReducer from "./features/EditDeleteExpense/EditDeleteExpenseSlice";
 
 export const store = configureStore({
   reducer: {

@@ -9,26 +9,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  deleteExpenseDetails,
-  setDeleteConformationDrawerOpen,
-} from "@/store/features/EditDeleteExpense";
-import { RootState } from "@/store/store";
-import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 import { FC } from "react";
 import { Loader2 } from "lucide-react";
-import { setDeletedExpenseInfo } from "@/store/features/DailyExpense";
-import { setDeletedProjectExpenseInfo } from "@/store/features/ProjectDetails";
-import { deleteProject, setProjectDeleteAlertOpen } from "@/store/features/GetProjects";
-
-interface conformationAlertDialogType {
-  openAlertDialog: boolean;
-  dispatch: ThunkDispatch<RootState, undefined, Action>;
-  expenseId: string;
-  deleteFuncLoad: boolean;
-  dailyExpensePage: boolean;
-  isDeleteProject?:boolean;
-}
+import { setDeletedProjectExpenseInfo } from "@/store/features/ProjectDetails/ProjectDetailsSlice";
+import { conformationAlertDialogType } from "./ConformationAlertDialogTypes";
+import { setProjectDeleteAlertOpen } from "@/store/features/GetProjects/GetProjectsSlice";
+import { setDeleteConformationDrawerOpen } from "@/store/features/EditDeleteExpense/EditDeleteExpenseSlice";
+import deleteProject from "@/store/features/GetProjects/Thunks/deleteProject/deleteProject";
+import { deleteExpenseDetails } from "@/store/features/EditDeleteExpense/Thunks/deleteExpenseDetails/deleteExpenseDetails";
+import { setDeletedExpenseInfo } from "@/store/features/DailyExpense/DailyExpenseSlice";
 
 const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
   openAlertDialog,
@@ -36,17 +25,19 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
   expenseId,
   deleteFuncLoad,
   dailyExpensePage,
-  isDeleteProject
+  isDeleteProject,
 }) => {
   return (
-    <AlertDialog
-      open={openAlertDialog}
-    >
+    <AlertDialog open={openAlertDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the {isDeleteProject?"project and the expense Related to it":"expense"}.
+            This action cannot be undone. This will permanently delete the{" "}
+            {isDeleteProject
+              ? "project and the expense Related to it"
+              : "expense"}
+            .
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -59,13 +50,14 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
             <>
               <AlertDialogCancel
                 onClick={() => {
-                  isDeleteProject?dispatch(setProjectDeleteAlertOpen(false)):
-                  dispatch(
-                    setDeleteConformationDrawerOpen({
-                      open: false,
-                      expenseId: "",
-                    })
-                  );
+                  isDeleteProject
+                    ? dispatch(setProjectDeleteAlertOpen(false))
+                    : dispatch(
+                        setDeleteConformationDrawerOpen({
+                          open: false,
+                          expenseId: "",
+                        })
+                      );
                 }}
               >
                 No
@@ -73,12 +65,13 @@ const ConformationAlertDialog: FC<conformationAlertDialogType> = ({
               <AlertDialogAction
                 style={{ backgroundColor: "red" }}
                 onClick={() => {
-                  isDeleteProject?dispatch(deleteProject()):
-                  dispatch(deleteExpenseDetails({ expenseId })).then(() => {
-                    dailyExpensePage ?
-                      dispatch(setDeletedExpenseInfo(expenseId))
-                      : dispatch(setDeletedProjectExpenseInfo(expenseId));
-                  });
+                  isDeleteProject
+                    ? dispatch(deleteProject())
+                    : dispatch(deleteExpenseDetails({ expenseId })).then(() => {
+                        dailyExpensePage
+                          ? dispatch(setDeletedExpenseInfo(expenseId))
+                          : dispatch(setDeletedProjectExpenseInfo(expenseId));
+                      });
                 }}
               >
                 Yes
