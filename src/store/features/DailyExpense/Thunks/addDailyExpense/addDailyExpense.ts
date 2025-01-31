@@ -19,6 +19,7 @@ import findPaymentModeName from "@/store/sharedUtils/findPaymentModeName";
 import checkContributerExists from "@/store/sharedUtils/checkContributerExists";
 import formatDate from "@/store/sharedUtils/formatDate";
 import { ExpenseType } from "@/store/SharedTypes/sharedTypes";
+import getUserAllMiscContributers from "@/store/sharedUtils/getUserAllMiscContributers";
 
 const addDailyExpense = createAsyncThunk<
   AddDailyExpenseResponse,
@@ -31,7 +32,16 @@ const addDailyExpense = createAsyncThunk<
         try {
           const state = thunkAPI.getState() as RootState;
 
-          const allMiscContri=window.location.pathname==="/u/daily-expense"?state.addDailyExpense.userAllMiscContributers:state.getProjectExpense.userAllMiscContributers;
+          // const allMiscContri=window.location.pathname==="/u/daily-expense"?state.addDailyExpense.userAllMiscContributers:state.getProjectExpense.userAllMiscContributers;
+
+          let allMiscContri:AllProjectContributerType[]=[];
+
+          if(state.addDailyExpense.miscellaneousInput){
+           allMiscContri = await getUserAllMiscContributers(
+              user.uid
+            );
+          }
+         
 
           let filteredDuplicateMiscbutersContri: AllProjectContributerType[] =
           allMiscContri;
@@ -101,8 +111,9 @@ const addDailyExpense = createAsyncThunk<
             expenseDocumentData
           );
 
+          let data=null;
           if (contributerExists.length == 0) {
-            let data;
+         
             if (expenseDocumentData.miscellaneous) {
               data = {
                 id: value.paidTo,
@@ -149,10 +160,13 @@ const addDailyExpense = createAsyncThunk<
 
           expenseDocumentData.expenseId = newExpense.id;
 
+          // const newMiscContri=state.addDailyExpense.miscellaneousInput?data:null;
+
           resolve({
             expenseId: newExpense.id,
             todayExpense: pushTodayExpense,
             newAddedExpense: expenseDocumentData,
+            // newMiscContri:newMiscContri
           });
         } catch (error) {
           console.error("Error fetching user data:", error);

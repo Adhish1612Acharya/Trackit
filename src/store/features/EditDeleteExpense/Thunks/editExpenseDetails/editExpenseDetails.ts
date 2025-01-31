@@ -19,6 +19,7 @@ import checkContributerExists from "@/store/sharedUtils/checkContributerExists";
 import findPaidToRoleName from "@/store/sharedUtils/findPaidToRoleName";
 import findPaymentModeName from "@/store/sharedUtils/findPaymentModeName";
 import findProjectTitle from "@/store/sharedUtils/findProjectTitle";
+import checkAndRemoveContributer from "../utils/removeContributer";
 
 const editExpenseDetails = createAsyncThunk<
   EditExpenseDetailsResponseType,
@@ -69,16 +70,15 @@ const editExpenseDetails = createAsyncThunk<
             editFormValue.miscellaneousPaidToRole
           );
 
-          let  miscellaneousId="";
+          let miscellaneousId = "";
 
-          if(state.editDeleteExpense.allProjectMiscContributer.length>0 && state.editDeleteExpense.miscellaneuosInput){
-             miscellaneousId = findMiscContributerId(
+          if (state.editDeleteExpense.miscellaneuosInput) {
+            miscellaneousId = findMiscContributerId(
               state.editDeleteExpense.allProjectMiscContributer,
               editFormValue.miscellaneuosPaidToName,
               editFormValue.miscellaneousPaidToRole
             );
           }
-         
 
           const updatedFormValue: any = {
             date: new Date(editFormValue.date),
@@ -122,6 +122,11 @@ const editExpenseDetails = createAsyncThunk<
 
           updatedFormValue.expenseId = state.editDeleteExpense.expenseId;
           updatedFormValue.date = String(editFormValue.date);
+
+          const contributerIdOfUneditedExpenseInfo = state.editDeleteExpense
+            .expenseInfo.miscellaneous
+            ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+            : state.editDeleteExpense.expenseInfo.paidToId;
 
           if (contributerExists.length == 0) {
             if (state.editDeleteExpense.miscellaneuosInput) {
@@ -192,6 +197,13 @@ const editExpenseDetails = createAsyncThunk<
               });
             }
           }
+
+          await checkAndRemoveContributer(
+            user.uid,
+            state.editDeleteExpense.currrentProject.id,
+            contributerIdOfUneditedExpenseInfo,
+            state.editDeleteExpense.expenseInfo.miscellaneous
+          );
 
           resolve({
             editedExpense: updatedFormValue,

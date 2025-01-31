@@ -4,10 +4,11 @@ import getUserDailyExpense from "./Thunks/getUserDailyExpense/getUserDailyExpens
 import addDailyExpense from "./Thunks/addDailyExpense/addDailyExpense";
 import { addProject } from "./Thunks/addProject/addProject";
 import applyFilter from "./Thunks/applyFilter/applyFilter";
+import { DailyExpenseInitialStateType } from "./DailyExpenseSliceTypes";
 import {
-  DailyExpenseInitialStateType,
-} from "./DailyExpenseSliceTypes";
-import { ExpenseType, ProjectOptionsType } from "@/store/SharedTypes/sharedTypes";
+  ExpenseType,
+  ProjectOptionsType,
+} from "@/store/SharedTypes/sharedTypes";
 
 const initialState: DailyExpenseInitialStateType = {
   projectsOptions: [],
@@ -23,7 +24,7 @@ const initialState: DailyExpenseInitialStateType = {
   addFilterBtnLoad: false,
   dataTableLoader: false,
   totalValue: 0,
-  userAllMiscContributers: [],
+  // userAllMiscContributers: [],
 };
 
 const dailyExpenseSlice = createSlice({
@@ -89,7 +90,7 @@ const dailyExpenseSlice = createSlice({
       state.projectsOptions = action.payload.userData.projects;
       state.filterProjects = [...action.payload.userData.projects];
       state.filterProjects.push({ id: "-1", name: "All" });
-      state.userAllMiscContributers = action.payload.miscContributers;
+      // state.userAllMiscContributers = action.payload.miscContributers;
       state.dataTableLoader = false;
     });
 
@@ -110,6 +111,12 @@ const dailyExpenseSlice = createSlice({
         state.expense.unshift(action.payload.todayExpense);
         state.totalValue += action.payload.todayExpense.amount;
       }
+
+      // if (action.payload.newMiscContri !== null) {
+      //   if (window.location.pathname === "/u/daily-expense") {
+      //     state.userAllMiscContributers.push(action.payload.newMiscContri);
+      //   }
+      // }
     });
 
     builder.addCase(addDailyExpense.rejected, (state, action) => {

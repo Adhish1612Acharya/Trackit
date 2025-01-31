@@ -1,7 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { DeleteExpenseDetailsResponseType } from "./deleteExpenseDetailsTypes";
 import { auth, db } from "@/firebaseconfig";
-import { arrayRemove, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  arrayRemove,
+  deleteDoc,
+  doc,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
+import checkAndRemoveContributer from "../utils/removeContributer";
 
 export const deleteExpenseDetails = createAsyncThunk<
   DeleteExpenseDetailsResponseType,
@@ -19,10 +26,10 @@ export const deleteExpenseDetails = createAsyncThunk<
             reject("Expense Not found");
           }
 
+          const expenseDetails = expenseDocSnap.data();
+
           // Delete the expense document
           await deleteDoc(expenseDocRef);
-
-          const expenseDetails = expenseDocSnap.data();
 
           // Update the user document
           const projectDocRef = doc(db, "projects", expenseDetails?.projectId);
@@ -30,6 +37,17 @@ export const deleteExpenseDetails = createAsyncThunk<
           await updateDoc(projectDocRef, {
             expenses: arrayRemove(expenseId),
           });
+
+          const contributerId = expenseDetails?.miscellaneous
+            ? expenseDetails?.miscellaneuosPaidToId
+            : expenseDetails?.paidToId;
+
+         await  checkAndRemoveContributer(
+            user.uid,
+            expenseDetails?.projectId,
+            contributerId,
+            expenseDetails?.miscellaneous
+          );
 
           resolve({
             deleteExpenseId: expenseDetails?.projectId,

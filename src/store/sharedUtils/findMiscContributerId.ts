@@ -7,16 +7,17 @@ const findMiscContributerId = (
   miscellaneuosPaidToName: string,
   miscellaneousPaidToRole: string
 ): string => {
-  const matchedMiscContributer = allProjectMiscContributer.filter(
-    (eachContributer) => {
-      return (
-        normalizeString(eachContributer.name) ===
-          normalizeString(miscellaneuosPaidToName) &&
-        normalizeString(eachContributer.miscellaneousRole) ===
-          normalizeString(miscellaneousPaidToRole)
-      );
-    }
-  );
+  const matchedMiscContributer =
+    allProjectMiscContributer.length > 0
+      ? allProjectMiscContributer.filter((eachContributer) => {
+          return (
+            normalizeString(eachContributer.name) ===
+              normalizeString(miscellaneuosPaidToName) &&
+            normalizeString(eachContributer.miscellaneousRole) ===
+              normalizeString(miscellaneousPaidToRole)
+          );
+        })
+      : [];
   if (matchedMiscContributer.length > 0) {
     return matchedMiscContributer[0].miscellaneousId;
   } else {

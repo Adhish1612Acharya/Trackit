@@ -1,11 +1,12 @@
 import { ExpenseType } from "@/store/SharedTypes/sharedTypes";
-import { AddedExpnseType} from "../../DailyExpenseSliceTypes";
-
+import { AddedExpnseType } from "../../DailyExpenseSliceTypes";
+// import { ContributersType } from "@/store/features/GetProjects/Thunks/getProjectDetails/getProjectDetailsTypes";
 
 export interface AddDailyExpenseResponse {
   expenseId: string;
   todayExpense: ExpenseType | null;
   newAddedExpense: AddedExpnseType;
+  // newMiscContri: ContributersType | null;
 }
 
 export interface FormValueType {

@@ -11,7 +11,7 @@ import {
   Timestamp,
   where,
 } from "firebase/firestore";
-import getUserAllMiscContributers from "@/store/sharedUtils/getUserAllMiscContributers";
+// import getUserAllMiscContributers from "@/store/sharedUtils/getUserAllMiscContributers";
 import formatDate from "@/store/sharedUtils/formatDate";
 import { ExpenseType } from "@/store/SharedTypes/sharedTypes";
 
@@ -26,9 +26,9 @@ const getUserDailyExpense = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          const userAllMiscContributers = await getUserAllMiscContributers(
-            user.uid
-          );
+          // const userAllMiscContributers = await getUserAllMiscContributers(
+          //   user.uid
+          // );
           
           // Format the date into "DD-MM-YYYY"
           const todayStartDate = new Date();
@@ -82,7 +82,7 @@ const getUserDailyExpense = createAsyncThunk<
               userData,
               dailyExpense: dailyExpense,
               total: total,
-              miscContributers:userAllMiscContributers
+              // miscContributers:userAllMiscContributers
             });
           }
         } catch (error) {

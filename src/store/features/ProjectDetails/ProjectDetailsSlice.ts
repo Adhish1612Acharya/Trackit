@@ -14,7 +14,7 @@ const initialState: ProjectDetailsSliceInitialStateType = {
   addFilterBtnLoad: false,
   dataTableLoader: false,
   total: 0,
-  userAllMiscContributers:[]
+  // userAllMiscContributers:[]
 };
 
 const getProjectDetailsSlice = createSlice({
@@ -95,7 +95,7 @@ const getProjectDetailsSlice = createSlice({
       state.total = action.payload.total;
       state.filterProjects = [...action.payload.userData.projects];
       state.filterProjects.push({ id: "-1", name: "All" });
-      state.userAllMiscContributers=action.payload.userAllMiscContributers;
+      // state.userAllMiscContributers=action.payload.userAllMiscContributers;
       state.dataTableLoader = false;
     });
 

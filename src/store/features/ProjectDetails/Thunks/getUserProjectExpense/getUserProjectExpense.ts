@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { setProjectName } from "../../ProjectDetailsSlice";
 import formatDate from "@/store/sharedUtils/formatDate";
-import getUserAllMiscContributers from "@/store/sharedUtils/getUserAllMiscContributers";
+// import getUserAllMiscContributers from "@/store/sharedUtils/getUserAllMiscContributers";
 
 const getUserProjectExpense = createAsyncThunk<
   GetUserDailyExpenseResponse,
@@ -26,9 +26,9 @@ const getUserProjectExpense = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          const userAllMiscContributers = await getUserAllMiscContributers(
-            user.uid
-          );
+          // const userAllMiscContributers = await getUserAllMiscContributers(
+          //   user.uid
+          // );
           // Query for daily expenses
           const userExpenseQuery = query(
             collection(db, "expense"),
@@ -82,7 +82,7 @@ const getUserProjectExpense = createAsyncThunk<
               userData,
               dailyExpense: dailyExpense,
               total,
-              userAllMiscContributers 
+              // userAllMiscContributers 
             });
           }
         } catch (error) {

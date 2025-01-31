@@ -1,5 +1,5 @@
 import { ExpenseType, ProjectOptionsType } from "@/store/SharedTypes/sharedTypes";
-import { AllProjectContributerType } from "../EditDeleteExpense/Thunks/getExpenseDetails/getExpenseDetailsTypes";
+// import { AllProjectContributerType } from "../EditDeleteExpense/Thunks/getExpenseDetails/getExpenseDetailsTypes";
 
 
 export interface DailyExpenseInitialStateType {
@@ -16,7 +16,7 @@ export interface DailyExpenseInitialStateType {
   addFilterBtnLoad: boolean;
   dataTableLoader: boolean;
   totalValue: number;
-  userAllMiscContributers: AllProjectContributerType[];
+  // userAllMiscContributers: AllProjectContributerType[];
 }
 
 export interface AddedExpnseType {
