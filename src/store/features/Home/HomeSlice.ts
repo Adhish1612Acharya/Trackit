@@ -29,7 +29,7 @@ export const LoginSlice = createSlice({
     builder.addCase(login.fulfilled, (state, _action) => {
       state.loginLoad = false;
       state.loggedIn = true;
-      toast.success("Success Login");
+      // toast.success("Success Login");
     });
 
     builder.addCase(login.rejected, (state, _action) => {
@@ -63,7 +63,7 @@ export const LoginSlice = createSlice({
 
     builder.addCase(googleLogin.fulfilled, (state, _action) => {
       state.googleLoginLoad = false;
-      toast.success("Success Login");
+      // toast.success("Success Login");
       state.loggedIn = true;
     });
 
