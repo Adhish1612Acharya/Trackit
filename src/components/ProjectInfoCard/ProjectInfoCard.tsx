@@ -74,10 +74,10 @@ const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
             <Eye className="mr-2 h-4 w-4" />
             View
           </Button>
-          <Button variant="outline" size="sm" className="flex-1">
+          {/* <Button variant="outline" size="sm" className="flex-1">
             <Pencil className="mr-2 h-4 w-4" />
             Edit
-          </Button>
+          </Button> */}
           <Button
             variant="destructive"
             size="sm"
