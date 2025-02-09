@@ -77,7 +77,7 @@ const getUserProjectExpense = createAsyncThunk<
           const updatedProjectDetail: any = queryResp.data();
           updatedProjectDetail.expenseTotal = total;
 
-          !updatedProjectDetail.expenseTotal &&   await updateDoc(doc(db, "projects", projectId), updatedProjectDetail);
+         await updateDoc(doc(db, "projects", projectId), updatedProjectDetail);
 
         
 
