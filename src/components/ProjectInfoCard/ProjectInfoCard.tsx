@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { HomeIcon, Eye, Pencil, Trash2 } from "lucide-react";
+import { HomeIcon, Eye,  Trash2 } from "lucide-react";
 import {
   setDeleteProjectId,
   setProjectDeleteAlertOpen,
@@ -8,7 +8,6 @@ import {
 import { ProjectInfoProps } from "./ProjectInfoCardTypes";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
-import { cn } from "@/lib/utils";
 
 const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
   title,

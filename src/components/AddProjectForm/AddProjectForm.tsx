@@ -59,7 +59,7 @@ const AddProjectForm: FC<addProjectFormProps> = ({
       } else {
         const newProjectResponse = (response.payload as AddProjectResponse)
           .newProject?.newProjectData;
-        dispatch(setNewProject(newProjectResponse));
+        dispatch(setNewProject(newProjectResponse as any));
         dispatch(setOpenAddProjectDrawer(false));
       }
     }

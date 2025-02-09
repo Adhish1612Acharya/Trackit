@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { setOpenAddProjectDrawer } from "@/store/features/GetProjects/GetProjectsSlice";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Fab } from "@mui/material";
 import ProjectCardSkeleton from "@/components/ProjectCardSkeleton/ProjectCardSkeleton";
 

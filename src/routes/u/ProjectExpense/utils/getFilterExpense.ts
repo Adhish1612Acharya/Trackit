@@ -1,7 +1,6 @@
 import getUserProjectExpense from "@/store/features/ProjectDetails/Thunks/getUserProjectExpense/getUserProjectExpense";
 import projectDetailsApplyFilter from "@/store/features/ProjectDetails/Thunks/projectDetailsApplyFilter/projectDetailsApplyFilter";
 import { Action, ThunkDispatch } from "@reduxjs/toolkit";
-import { Root } from "react-dom/client";
 
 const getFilterExpense = (
   getFilterItem: (key: string) => string[],
