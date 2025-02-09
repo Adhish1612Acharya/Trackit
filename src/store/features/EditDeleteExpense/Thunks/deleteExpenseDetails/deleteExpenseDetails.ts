@@ -6,6 +6,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  increment,
   updateDoc,
 } from "firebase/firestore";
 import checkAndRemoveContributer from "../utils/removeContributer";
@@ -36,13 +37,14 @@ export const deleteExpenseDetails = createAsyncThunk<
 
           await updateDoc(projectDocRef, {
             expenses: arrayRemove(expenseId),
+            expenseTotal: increment(-(expenseDetails as any).amount),
           });
 
           const contributerId = expenseDetails?.miscellaneous
             ? expenseDetails?.miscellaneuosPaidToId
             : expenseDetails?.paidToId;
 
-         await  checkAndRemoveContributer(
+          await checkAndRemoveContributer(
             user.uid,
             expenseDetails?.projectId,
             contributerId,

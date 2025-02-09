@@ -8,6 +8,7 @@ import {
   collection,
   doc,
   getDoc,
+  increment,
   updateDoc,
 } from "firebase/firestore";
 import { AllProjectContributerType } from "@/store/features/EditDeleteExpense/Thunks/getExpenseDetails/getExpenseDetailsTypes";
@@ -34,23 +35,20 @@ const addDailyExpense = createAsyncThunk<
 
           // const allMiscContri=window.location.pathname==="/u/daily-expense"?state.addDailyExpense.userAllMiscContributers:state.getProjectExpense.userAllMiscContributers;
 
-          let allMiscContri:AllProjectContributerType[]=[];
+          let allMiscContri: AllProjectContributerType[] = [];
 
-          if(state.addDailyExpense.miscellaneousInput){
-           allMiscContri = await getUserAllMiscContributers(
-              user.uid
-            );
+          if (state.addDailyExpense.miscellaneousInput) {
+            allMiscContri = await getUserAllMiscContributers(user.uid);
           }
-         
 
           let filteredDuplicateMiscbutersContri: AllProjectContributerType[] =
-          allMiscContri;
+            allMiscContri;
 
           const projectDocRef = doc(db, "projects", value.project);
 
           const projectDoc = await getDoc(projectDocRef);
 
-          const projectData = projectDoc.data();
+          const projectData: any = projectDoc.data();
 
           const contributersLists = projectData ? projectData.contributers : [];
 
@@ -70,17 +68,15 @@ const addDailyExpense = createAsyncThunk<
 
           const paymentModeName = findPaymentModeName(value.paymentMode);
 
-          let miscellaneousId ="";
+          let miscellaneousId = "";
 
-          if(state.addDailyExpense.miscellaneousInput){ 
-             miscellaneousId = findMiscContributerId(
+          if (state.addDailyExpense.miscellaneousInput) {
+            miscellaneousId = findMiscContributerId(
               filteredDuplicateMiscbutersContri,
               value.miscellaneousPaidToName,
               value.miscellaneousPaidToRole
             );
           }
-
-         
 
           const expenseDocumentData: any = {
             date: new Date(value.date),
@@ -111,9 +107,15 @@ const addDailyExpense = createAsyncThunk<
             expenseDocumentData
           );
 
-          let data=null;
+          projectData.expenseTotal =
+            Number(projectData.expenseTotal) + Number(value.amount);
+
+          await updateDoc(projectDocRef, {
+            expenseTotal: increment(Number(value.amount)),
+          });
+
+          let data = null;
           if (contributerExists.length == 0) {
-         
             if (expenseDocumentData.miscellaneous) {
               data = {
                 id: value.paidTo,

@@ -24,6 +24,8 @@ const initialState: DailyExpenseInitialStateType = {
   addFilterBtnLoad: false,
   dataTableLoader: false,
   totalValue: 0,
+  filterInitialState: [],
+  filterAppliedCount: 0,
   // userAllMiscContributers: [],
 };
 
@@ -76,6 +78,21 @@ const dailyExpenseSlice = createSlice({
     setAddExpenseLoad: (state, action: PayloadAction<boolean>) => {
       state.addExpenseBtnLoad = action.payload;
     },
+    setFilteredInitialState: (state, action: PayloadAction<string[]>) => {
+      state.filterInitialState = action.payload;
+      let count = 0;
+      action.payload.forEach((eachFilter) => {
+        if (
+          eachFilter !== "" &&
+          eachFilter !== "-1" &&
+          eachFilter !== "undefined" &&
+          eachFilter !== "null"
+        ) {
+          count++;
+        }
+      });
+      state.filterAppliedCount = count;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(getUserDailyExpense.pending, (state, _action) => {
@@ -89,7 +106,7 @@ const dailyExpenseSlice = createSlice({
       state.totalValue = Number(action.payload.total);
       state.projectsOptions = action.payload.userData.projects;
       state.filterProjects = [...action.payload.userData.projects];
-      state.filterProjects.push({ id: "-1", name: "All" });
+      // state.filterProjects.push({ id: "-1", name: "All" });
       // state.userAllMiscContributers = action.payload.miscContributers;
       state.dataTableLoader = false;
     });
@@ -178,4 +195,5 @@ export const {
   setEditedExpenseInfo,
   setDeletedExpenseInfo,
   setAddExpenseLoad,
+  setFilteredInitialState
 } = dailyExpenseSlice.actions;

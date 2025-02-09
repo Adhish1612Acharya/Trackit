@@ -3,11 +3,13 @@ import ConformationAlertDialog from "@/components/ConformationAlertDialog/Confor
 import ProjectInfoCard from "@/components/ProjectInfoCard/ProjectInfoCard";
 import getProjectsDetails from "@/store/features/GetProjects/Thunks/getProjectDetails/getProjectDetails";
 import { useAppDispatch, useAppSelector } from "@/store/store";
-import { Fab, Skeleton } from "@mui/material";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import { setOpenAddProjectDrawer } from "@/store/features/GetProjects/GetProjectsSlice";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Fab } from "@mui/material";
+import ProjectCardSkeleton from "@/components/ProjectCardSkeleton/ProjectCardSkeleton";
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -41,7 +43,7 @@ const Projects = () => {
   return (
     <>
       <div
-        className="flex flex-row w-full h-max justify-evenly align-evenly flex-wrap"
+        className="flex flex-row w-full  h-max justify-evenly align-evenly flex-wrap"
         style={{ marginTop: "4rem" }}
       >
         {!getProjectDetailsLoading ? (
@@ -52,25 +54,18 @@ const Projects = () => {
                 id={project.id}
                 title={project.title}
                 description={project.description}
-                budget={String(project.budget)}
+                budget={project.budget}
+                expenseTotal={project.expenseTotal}
                 navigate={navigate}
                 dispatch={dispatch}
               />
             );
           })
         ) : (
-          <div className="flex-column ">
-            <Skeleton
-              variant="rectangular"
-              style={{ maxWidth: "100%", width: "60rem", height: "16rem" }}
-            />
-            <br></br>
-
-            <Skeleton
-              variant="rectangular"
-              style={{ maxWidth: "100%", width: "60rem", height: "16rem" }}
-            />
-          </div>
+          <>
+            <ProjectCardSkeleton />
+            <ProjectCardSkeleton />
+          </>
         )}
       </div>
       {/* Floating Action Button */}

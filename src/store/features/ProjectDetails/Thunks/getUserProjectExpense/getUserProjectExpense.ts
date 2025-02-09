@@ -9,6 +9,7 @@ import {
   orderBy,
   query,
   Timestamp,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { setProjectName } from "../../ProjectDetailsSlice";
@@ -73,6 +74,13 @@ const getUserProjectExpense = createAsyncThunk<
 
           const projectDetail = queryResp.data();
 
+          const updatedProjectDetail: any = queryResp.data();
+          updatedProjectDetail.expenseTotal = total;
+
+          !updatedProjectDetail.expenseTotal &&   await updateDoc(doc(db, "projects", projectId), updatedProjectDetail);
+
+        
+
           thunkAPI.dispatch(setProjectName(projectDetail?.title));
 
           if (userDocSnap.exists()) {
@@ -82,7 +90,7 @@ const getUserProjectExpense = createAsyncThunk<
               userData,
               dailyExpense: dailyExpense,
               total,
-              // userAllMiscContributers 
+              // userAllMiscContributers
             });
           }
         } catch (error) {

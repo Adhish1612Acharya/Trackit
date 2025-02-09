@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigationType, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import DataTable from "@/components/DataTable/DataTable";
 import { Container, Fab } from "@mui/material";
@@ -6,16 +6,24 @@ import { useAppDispatch, useAppSelector } from "@/store/store";
 import FilterDrawer from "@/components/FilterDrawer/FilterDrawer";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
 import EditDialog from "@/components/EditDialog/EditDialog";
-import { setEditDrawerOpen } from "@/store/features/EditDeleteExpense/EditDeleteExpenseSlice";
+import {
+  setDeleteConformationDrawerOpen,
+  setEditDrawerOpen,
+} from "@/store/features/EditDeleteExpense/EditDeleteExpenseSlice";
 import AddExpenseDrawer from "@/components/AddExpenseDrawer/AddExpenseDrawer";
 import AddIcon from "@mui/icons-material/Add";
 import { setOpenAddExpenseDrawer } from "@/store/features/DailyExpense/DailyExpenseSlice";
-import getUserProjectExpense from "@/store/features/ProjectDetails/Thunks/getUserProjectExpense/getUserProjectExpense";
+import useLocalStorage from "@/hooks/useLocalStorage/useLocalStorage";
+import { setFilteredInitialState } from "@/store/features/ProjectDetails/ProjectDetailsSlice";
+import getFilterExpense from "./utils/getFilterExpense";
 
 const ProjectExpense = () => {
   const { id } = useParams();
+  const { getFilterItem, setItem } = useLocalStorage();
 
   const dispatch = useAppDispatch();
+
+  const navigationType = useNavigationType();
 
   const dataTableLoader = useAppSelector(
     (state) => state.addDailyExpense.dataTableLoader
@@ -92,11 +100,26 @@ const ProjectExpense = () => {
     (state) => state.addDailyExpense.miscellaneousInput
   );
 
-  useEffect(() => {
-    dispatch(getUserProjectExpense(id as string));
-  }, [dispatch, id]);
+  const filterInitialState = useAppSelector(
+    (state) => state.getProjectExpense.filterInitialState
+  );
+
+  const filterAppliedCount = useAppSelector(
+    (state) => state.getProjectExpense.filterAppliedCount
+  );
 
   useEffect(() => {
+    return () => {
+      if (navigationType === "PUSH" || navigationType === "REPLACE") {
+        setItem("projectPageFilter", ["", "-1", "-1"]);
+        dispatch(setFilteredInitialState(["", "-1", "-1"]));
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const filterArray = getFilterItem("projectPageFilter");
+    dispatch(setFilteredInitialState(filterArray));
     dispatch(
       setEditDrawerOpen({
         id: "",
@@ -104,7 +127,9 @@ const ProjectExpense = () => {
         dailyExpenseOrNot: false,
       })
     );
-  }, [dispatch]);
+    dispatch(setDeleteConformationDrawerOpen({ open: false, expenseId: "" }));
+    getFilterExpense(getFilterItem, dispatch, id);
+  }, [dispatch, id]);
 
   return (
     <Container className="max-w-full">
@@ -116,6 +141,7 @@ const ProjectExpense = () => {
         dailyExpense={false}
         projectName={projectTitle}
         dataTableLoader={dataTableLoader}
+        filterAppliedCount={filterAppliedCount}
       />
 
       <Fab
@@ -138,6 +164,7 @@ const ProjectExpense = () => {
         dispatch={dispatch}
         projectExpense={true}
         projectId={String(id)}
+        filterInitialValue={filterInitialState}
       />
 
       <ConformationAlertDialog

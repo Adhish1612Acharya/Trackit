@@ -9,8 +9,8 @@
     "noUnusedParameters": false,
     "baseUrl": ".",
     "paths": {
-      // "@/*": ["./src/*"]
-      "include": ["src/*"],
+      "@/*": ["./src/*"],
+      // "include": ["src/*"],
       "exclude": ["node_modules", "dist"]
     }
   }

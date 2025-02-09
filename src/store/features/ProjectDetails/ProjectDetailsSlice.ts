@@ -14,6 +14,8 @@ const initialState: ProjectDetailsSliceInitialStateType = {
   addFilterBtnLoad: false,
   dataTableLoader: false,
   total: 0,
+  filterInitialState: [],
+  filterAppliedCount: 0,
   // userAllMiscContributers:[]
 };
 
@@ -53,6 +55,8 @@ const getProjectDetailsSlice = createSlice({
     ) => {
       const newExpense = action.payload.expense;
 
+      state.total += newExpense.amount;
+
       // Convert 'day-month-year' format to a comparable string 'YYYY-MM-DD'
       const newExpenseDate = (newExpense.date as string)
         .split("-")
@@ -70,7 +74,7 @@ const getProjectDetailsSlice = createSlice({
             .split("-")
             .reverse()
             .join("-");
-          return newExpenseDate >expenseDate; // Insert before the first expense with a later date
+          return newExpenseDate > expenseDate; // Insert before the first expense with a later date
         });
 
         if (index === -1) {
@@ -81,6 +85,21 @@ const getProjectDetailsSlice = createSlice({
           state.expense.splice(index, 0, newExpense);
         }
       }
+    },
+    setFilteredInitialState: (state, action: PayloadAction<string[]>) => {
+      state.filterInitialState = action.payload;
+      let count = 0;
+      action.payload.forEach((eachFilter) => {
+        if (
+          eachFilter !== "" &&
+          eachFilter !== "-1" &&
+          eachFilter !== "undefined" &&
+          eachFilter !== "null"
+        ) {
+          count++;
+        }
+      });
+      state.filterAppliedCount = count;
     },
   },
   extraReducers: (builder) => {
@@ -133,4 +152,5 @@ export const {
   setEditedProjectExpenseInfo,
   setDeletedProjectExpenseInfo,
   addProjectExpense,
+  setFilteredInitialState,
 } = getProjectDetailsSlice.actions;

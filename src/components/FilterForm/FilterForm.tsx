@@ -13,24 +13,56 @@ import { z } from "zod";
 import SelectInput from "../SelectInput/SelectInput";
 import { constructionRolesFilterSearch } from "@/filterData/contructionRolesData";
 import { paymentTypesFilterSearch } from "@/filterData/paymentFilters";
-import {  useAppSelector } from "@/store/store";
+import { useAppSelector } from "@/store/store";
 import filterSearchScheme from "@/validations/forms/FilterSearchForm";
 import { Button } from "../ui/button";
 import { Loader2 } from "lucide-react";
 import { filterFormProps } from "./FilterFormTypes";
 import applyFilter from "@/store/features/DailyExpense/Thunks/applyFilter/applyFilter";
+import useLocalStorage from "@/hooks/useLocalStorage/useLocalStorage";
+import {
+  setFilteredInitialState,
+  setOpenFilterDrawer,
+} from "@/store/features/DailyExpense/DailyExpenseSlice";
 
-const FilterForm: FC<filterFormProps> = ({ dispatch, projectOptions }) => {
+const FilterForm: FC<filterFormProps> = ({
+  dispatch,
+  projectOptions,
+  filterInitialValue,
+}) => {
+  const { setItem } = useLocalStorage();
+
   const form = useForm<z.infer<typeof filterSearchScheme>>({
     resolver: zodResolver(filterSearchScheme),
     defaultValues: {
-      paidToId: "-1",
-      paymentModeId: "-1",
-      projectId: "-1",
+      paidToId: filterInitialValue[0] || "-1",
+      paymentModeId: filterInitialValue[1] || "-1",
+      projectId: filterInitialValue[2] || "-1",
     },
   });
 
+  const resetFilter = () => {
+    setItem("dailyExpensePageFilter", ["-1", "-1", "-1"]);
+    dispatch(setFilteredInitialState(["-1", "-1", "-1"]));
+    dispatch(setOpenFilterDrawer(false));
+    dispatch(
+      applyFilter({ paidToId: "-1", paymentModeId: "-1", projectId: "-1" })
+    );
+  };
+
   const onSubmit = (filterData: z.infer<typeof filterSearchScheme>) => {
+    setItem("dailyExpensePageFilter", [
+      filterData.paidToId,
+      filterData.paymentModeId,
+      filterData.projectId,
+    ]);
+    const filterArray = [
+      filterData.paidToId,
+      filterData.paymentModeId,
+      filterData.projectId,
+    ];
+    dispatch(setFilteredInitialState(filterArray));
+
     dispatch(applyFilter(filterData));
   };
   return (
@@ -105,16 +137,19 @@ const FilterForm: FC<filterFormProps> = ({ dispatch, projectOptions }) => {
             Applying filter
           </Button>
         ) : (
-          <Button
-            color="primary"
-            type="submit"
-            // disabled={useAppSelector(
-            //   (state) => state.addDailyExpense.addExpenseBtnLoad
-            // )}
-            className="w-full mx-1"
-          >
-            Apply
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              color="primary"
+              type="button"
+              onClick={() => resetFilter()}
+              className="w-1/2 mx-1"
+            >
+              Clear
+            </Button>
+            <Button color="primary" type="submit" className="w-1/2 mx-1">
+              Apply
+            </Button>
+          </div>
         )}
       </form>
     </Form>

@@ -5,8 +5,9 @@ import { NavigateFunction } from "react-router-dom";
 export interface ProjectInfoProps {
   title: string;
   description: string;
-  budget: string;
+  budget: number;
   id: string;
+  expenseTotal: number;
   navigate: NavigateFunction;
   dispatch: ThunkDispatch<RootState, undefined, Action>;
 }

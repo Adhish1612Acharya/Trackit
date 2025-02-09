@@ -1,4 +1,7 @@
-import { ExpenseType, ProjectOptionsType } from "@/store/SharedTypes/sharedTypes";
+import {
+  ExpenseType,
+  ProjectOptionsType,
+} from "@/store/SharedTypes/sharedTypes";
 // import { AllProjectContributerType } from "../EditDeleteExpense/Thunks/getExpenseDetails/getExpenseDetailsTypes";
 
 export interface ProjectDetailsSliceInitialStateType {
@@ -10,5 +13,7 @@ export interface ProjectDetailsSliceInitialStateType {
   dataTableLoader: boolean;
   total: number;
   projectName: string;
+  filterInitialState: string[];
+  filterAppliedCount:number;
   // userAllMiscContributers: AllProjectContributerType[];
 }

@@ -45,10 +45,12 @@ import {
 import getUserDailyExpense from "@/store/features/DailyExpense/Thunks/getUserDailyExpense/getUserDailyExpense";
 import { EditedFormValueType } from "@/store/features/EditDeleteExpense/Thunks/editExpenseDetails/editExpenseDetailsTypes";
 import editExpenseDetails from "@/store/features/EditDeleteExpense/Thunks/editExpenseDetails/editExpenseDetails";
-import getUserProjectExpense from "@/store/features/ProjectDetails/Thunks/getUserProjectExpense/getUserProjectExpense";
 import { addProjectExpense } from "@/store/features/ProjectDetails/ProjectDetailsSlice";
 import { VisuallyHiddenInput } from "./AddExpenseFormCustomStyles";
 import { ExpenseType } from "@/store/SharedTypes/sharedTypes";
+import getFilterExpense from "@/routes/u/ProjectExpense/utils/getFilterExpense";
+import useLocalStorage from "@/hooks/useLocalStorage/useLocalStorage";
+// import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const AddExpenseForm: FC<addExpenseFormProps> = ({
   dispatch,
@@ -64,6 +66,8 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
   const [pdfBlob, setPdfBlob] = useState<Blob | undefined>(undefined);
   const [convertPdfLoad, setConvertPdfLoad] = useState<boolean>(false);
   const [openPdfLoad, setOpenPdfLoad] = useState<boolean>(false);
+
+  const { getFilterItem } = useLocalStorage();
 
   const form = useForm<z.infer<typeof addExpenseFormSchema>>({
     resolver: zodResolver(addExpenseFormSchema),
@@ -173,6 +177,8 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
           setConvertPdfLoad(false); // Ensure loading state is reset
         }
       }
+
+      // await generateWithAI()
     };
   };
 
@@ -211,6 +217,50 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
     setPdfBlob(undefined);
   };
 
+  // const convertToBase64 = (uploadedFile: File): Promise<string>  => {
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(uploadedFile);
+  //     reader.onload = () => {
+  //       if (typeof reader.result === "string") {
+  //         resolve(reader.result.split(",")[1]); // Ensure it's a string before calling .split()
+  //       } else {
+  //         reject(new Error("File conversion failed: Result is not a string"));
+  //       }
+  //     };
+  //     reader.onerror = (error) => reject(error);
+  //   });
+  // };
+
+  // const generateWithAI = async () => {
+  //   const uploadedFile = form.getValues("file") as File | undefined;
+
+  //   if (!uploadedFile || !(uploadedFile instanceof File)) {
+  //     console.error("No valid file uploaded");
+  //     return;
+  //   }
+
+  //   const genAI = new GoogleGenerativeAI(
+  //     "AIzaSyBoE5l0fa9oT_Z6lq4L9UX70k1Dpo82NYw"
+  //   );
+  //   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  //   try {
+  //     const base64StringOfImage = await convertToBase64(uploadedFile);
+
+  //     if (base64StringOfImage) {
+  //       const prompt = "Give a description for the uploaded bill image";
+  //       const result = await model.generateContent([
+  //         prompt,
+  //         base64StringOfImage,
+  //       ]);
+  //       console.log(result.response.text());
+  //     }
+  //   } catch (error) {
+  //     console.error("Error generating AI content:", error);
+  //   }
+  // };
+
   const onSubmit = async (formData: z.infer<typeof addExpenseFormSchema>) => {
     if (editForm) {
       const editedFormData: EditedFormValueType = {
@@ -244,7 +294,8 @@ const AddExpenseForm: FC<addExpenseFormProps> = ({
       if (isDailyExpense) {
         await dispatch(getUserDailyExpense());
       } else if (isProjectPage) {
-        await dispatch(getUserProjectExpense(expense ? expense.projectId : ""));
+        // await dispatch(getUserProjectExpense(expense ? expense.projectId : ""));
+        getFilterExpense(getFilterItem, dispatch, expense?.projectId);
       }
 
       dispatch(

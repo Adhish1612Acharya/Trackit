@@ -16,6 +16,8 @@ export interface DailyExpenseInitialStateType {
   addFilterBtnLoad: boolean;
   dataTableLoader: boolean;
   totalValue: number;
+  filterInitialState: string[];
+  filterAppliedCount:number;
   // userAllMiscContributers: AllProjectContributerType[];
 }
 

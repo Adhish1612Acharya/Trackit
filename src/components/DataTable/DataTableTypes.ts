@@ -10,4 +10,5 @@ export interface DataTableProps {
   dailyExpense: boolean;
   projectName?: string;
   dataTableLoader: boolean;
+  filterAppliedCount: number;
 }

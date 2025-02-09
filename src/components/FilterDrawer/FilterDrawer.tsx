@@ -16,6 +16,7 @@ const FilterDrawer: FC<filterDrawerOpenProps> = ({
   projectOptions,
   projectExpense,
   projectId,
+  filterInitialValue
 }) => {
   return (
     <Dialog
@@ -40,9 +41,9 @@ const FilterDrawer: FC<filterDrawerOpenProps> = ({
       <DialogContent>
         <DialogContentText>Find expense based on the filter</DialogContentText>
         {projectExpense ? (
-          <ProjectExpenseFilterForm dispatch={dispatch} projectId={projectId} />
+          <ProjectExpenseFilterForm dispatch={dispatch} filterInitialValue={filterInitialValue} projectId={projectId} />
         ) : (
-          <FilterForm dispatch={dispatch} projectOptions={projectOptions} />
+          <FilterForm dispatch={dispatch} filterInitialValue={filterInitialValue} projectOptions={projectOptions} />
         )}
       </DialogContent>
     </Dialog>

@@ -12,6 +12,7 @@ import {
   writeBatch,
   arrayUnion,
   arrayRemove,
+  increment,
 } from "firebase/firestore";
 import { auth, db } from "@/firebaseconfig";
 import findMiscContributerId from "@/store/sharedUtils/findMiscContributerId";
@@ -20,6 +21,7 @@ import findPaidToRoleName from "@/store/sharedUtils/findPaidToRoleName";
 import findPaymentModeName from "@/store/sharedUtils/findPaymentModeName";
 import findProjectTitle from "@/store/sharedUtils/findProjectTitle";
 import checkAndRemoveContributer from "../utils/removeContributer";
+import { ProjectsType } from "@/store/features/GetProjects/Thunks/getProjectDetails/getProjectDetailsTypes";
 
 const editExpenseDetails = createAsyncThunk<
   EditExpenseDetailsResponseType,
@@ -59,7 +61,7 @@ const editExpenseDetails = createAsyncThunk<
           const projectDocRef = doc(db, "projects", editFormValue.projectId);
           const projectDoc = await getDoc(projectDocRef);
 
-          const projectData = projectDoc.data();
+          const projectData: ProjectsType = projectDoc.data() as ProjectsType;
 
           contrubutersLists = projectData ? projectData.contributers : [];
 
@@ -149,6 +151,10 @@ const editExpenseDetails = createAsyncThunk<
             }
           }
 
+          const prevExpense = state.editDeleteExpense.expenseInfo.amount;
+          const currExpense = editFormValue.amount;
+          const updatedExpenseTotalDiff = Math.abs(prevExpense - currExpense);
+
           if (
             editFormValue.projectId !==
             state.editDeleteExpense.currrentProject.id
@@ -175,10 +181,18 @@ const editExpenseDetails = createAsyncThunk<
               batch.update(expenseDocRef2, {
                 expenses: arrayUnion(state.editDeleteExpense.expenseId),
                 contributers: arrayUnion(contributerData),
+                expenseTotal:
+                  currExpense > prevExpense
+                    ? increment(updatedExpenseTotalDiff)
+                    : increment(-updatedExpenseTotalDiff),
               });
             } else {
               batch.update(expenseDocRef2, {
                 expenses: arrayUnion(state.editDeleteExpense.expenseId),
+                expenseTotal:
+                  currExpense > prevExpense
+                    ? increment(updatedExpenseTotalDiff)
+                    : increment(-updatedExpenseTotalDiff),
               });
             }
 
@@ -192,9 +206,34 @@ const editExpenseDetails = createAsyncThunk<
                 editFormValue.projectId
               );
 
-              await updateDoc(projectDocRef, {
-                contributers: arrayUnion(contributerData),
-              });
+              if (
+                state.editDeleteExpense.expenseInfo.amount !==
+                editFormValue.amount
+              ) {
+                await updateDoc(projectDocRef, {
+                  contributers: arrayUnion(contributerData),
+                  expenseTotal:
+                    currExpense > prevExpense
+                      ? increment(updatedExpenseTotalDiff)
+                      : increment(-updatedExpenseTotalDiff),
+                });
+              } else {
+                await updateDoc(projectDocRef, {
+                  contributers: arrayUnion(contributerData),
+                });
+              }
+            } else {
+              if (
+                state.editDeleteExpense.expenseInfo.amount !==
+                editFormValue.amount
+              ) {
+                await updateDoc(projectDocRef, {
+                  expenseTotal:
+                    currExpense > prevExpense
+                      ? increment(updatedExpenseTotalDiff)
+                      : increment(-updatedExpenseTotalDiff),
+                });
+              }
             }
           }
 

@@ -1,5 +1,5 @@
 import { createContext, useState, useContext, ReactNode } from "react";
-import { LoginContextType } from "./LoginProviderContextTypes";
+import { LoginContextType } from "./LoginProviderContext.types";
 
 
 // Create the context with a default value

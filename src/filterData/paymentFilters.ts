@@ -102,7 +102,7 @@ export  const paymentTypesFilterSearch = [
   { id: 48, name: "MobiKwik" },
   { id: 49, name: "FreeCharge" },
   { id: 50, name: "Sodexo" },
-  {id:-1,name:"All"}
+  // {id:-1,name:""}
 ];
 
 export default paymentTypes;

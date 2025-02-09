@@ -1,9 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { GetProjectDetailsResponse, ProjectsType } from "./getProjectDetailsTypes";
+import {
+  GetProjectDetailsResponse,
+  ProjectsType,
+} from "./getProjectDetailsTypes";
 import { auth, db } from "@/firebaseconfig";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
- const getProjectDetails = createAsyncThunk<
+const getProjectDetails = createAsyncThunk<
   GetProjectDetailsResponse,
   void,
   { rejectValue: string }
@@ -12,7 +21,6 @@ import { collection, getDocs, query, where } from "firebase/firestore";
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-         
           const projectQuery = query(
             collection(db, "projects"),
             where("owner", "==", `${user.uid}`)
@@ -28,7 +36,6 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 
           resolve({
             projects: projects,
-           
           });
         } catch (err) {
           reject(err);

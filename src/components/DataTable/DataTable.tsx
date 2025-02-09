@@ -1,7 +1,7 @@
 // DataTable.js
 import { FC, useState } from "react";
 import "../../style/dataTable.css";
-import { Typography, Box, Button, Skeleton, Paper } from "@mui/material";
+import { Typography, Box, Button, Skeleton, Paper, Badge } from "@mui/material";
 import { setOpenFilterDrawer } from "@/store/features/DailyExpense/DailyExpenseSlice";
 import ExpenseAccordian from "../ExpenseAccordian/ExpenseAccordian";
 import TableComponent from "../TableComponent/TableComponent";
@@ -17,6 +17,7 @@ const DataTable: FC<DataTableProps> = ({
   dailyExpense,
   projectName,
   dataTableLoader,
+  filterAppliedCount,
 }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -50,25 +51,26 @@ const DataTable: FC<DataTableProps> = ({
         >
           {dailyExpense ? "Today's Expense Tracker" : projectName}
         </Typography>
-
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<FilterListIcon />}
-          sx={{
-            textTransform: "none",
-            borderRadius: "20px",
-            padding: "8px 16px",
-            minWidth: "100px",
-          }}
-          onClick={() =>
-            projectExpense
-              ? dispatch(setProjectDetailsOpenFilterDrawer(true))
-              : dispatch(setOpenFilterDrawer(true))
-          }
-        >
-          Filter
-        </Button>
+        <Badge color="secondary" badgeContent={filterAppliedCount}>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<FilterListIcon />}
+            sx={{
+              textTransform: "none",
+              borderRadius: "20px",
+              padding: "8px 16px",
+              minWidth: "100px",
+            }}
+            onClick={() =>
+              projectExpense
+                ? dispatch(setProjectDetailsOpenFilterDrawer(true))
+                : dispatch(setOpenFilterDrawer(true))
+            }
+          >
+            Filter
+          </Button>
+        </Badge>
       </Box>
 
       {totalExpense >= 0 ? (

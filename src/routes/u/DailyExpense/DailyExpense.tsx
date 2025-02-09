@@ -6,17 +6,27 @@ import { useAppDispatch, useAppSelector } from "@/store/store";
 
 import AddExpenseDrawer from "@/components/AddExpenseDrawer/AddExpenseDrawer";
 import FilterDrawer from "@/components/FilterDrawer/FilterDrawer";
-import { useLogin } from "@/Context/LoginProviderContext/LoginProviderContext";
+// import { useLogin } from "@/Context/LoginProviderContext/LoginProviderContext";
 import ConformationAlertDialog from "@/components/ConformationAlertDialog/ConformationAlertDialog";
-import { setDeleteConformationDrawerOpen } from "@/store/features/EditDeleteExpense/EditDeleteExpenseSlice";
+import {
+  setDeleteConformationDrawerOpen,
+  setEditDrawerOpen,
+} from "@/store/features/EditDeleteExpense/EditDeleteExpenseSlice";
 import EditDialog from "@/components/EditDialog/EditDialog";
 import AddProjectDrawer from "@/components/AddProjectDrawer/AddProjectDrawer";
 import getUserDailyExpense from "@/store/features/DailyExpense/Thunks/getUserDailyExpense/getUserDailyExpense";
-import { setOpenAddExpenseDrawer } from "@/store/features/DailyExpense/DailyExpenseSlice";
+import {
+  setFilteredInitialState,
+  setOpenAddExpenseDrawer,
+} from "@/store/features/DailyExpense/DailyExpenseSlice";
+import useLocalStorage from "@/hooks/useLocalStorage/useLocalStorage";
+import { useNavigationType } from "react-router-dom";
 
 const DailyExpense = () => {
   const dispatch = useAppDispatch();
-  const { setIsLoggedIn } = useLogin();
+  // const { setIsLoggedIn } = useLogin();
+  const { getFilterItem, setItem } = useLocalStorage();
+  const navigationType = useNavigationType();
 
   const dataTableLoader = useAppSelector(
     (state) => state.addDailyExpense.dataTableLoader
@@ -95,12 +105,35 @@ const DailyExpense = () => {
     (state) => state.addDailyExpense.addProjectBtnLoad
   );
 
-  useEffect(() => {
-    dispatch(getUserDailyExpense());
-  }, [dispatch, setIsLoggedIn]);
+  const filterInitialState = useAppSelector(
+    (state) => state.addDailyExpense.filterInitialState
+  );
+
+  const filterAppliedCount = useAppSelector(
+    (state) => state.addDailyExpense.filterAppliedCount
+  );
 
   useEffect(() => {
+    return () => {
+      if (navigationType === "PUSH" || navigationType === "REPLACE") {
+        setItem("dailyExpensePageFilter", ["-1", "-1", "-1"]);
+        dispatch(setFilteredInitialState(["-1", "-1", "-1"]));
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const filterArray = getFilterItem("dailyExpensePageFilter");
+    dispatch(setFilteredInitialState(filterArray));
     dispatch(setDeleteConformationDrawerOpen({ open: false, expenseId: "" }));
+    dispatch(
+      setEditDrawerOpen({
+        id: "",
+        open: false,
+        dailyExpenseOrNot: false,
+      })
+    );
+    dispatch(getUserDailyExpense());
   }, [dispatch]);
 
   return (
@@ -112,6 +145,7 @@ const DailyExpense = () => {
         totalExpense={totalValue}
         dailyExpense={true}
         dataTableLoader={dataTableLoader}
+        filterAppliedCount={filterAppliedCount}
       />
 
       {/* Floating Action Button */}
@@ -135,6 +169,7 @@ const DailyExpense = () => {
         dispatch={dispatch}
         projectExpense={false}
         projectId={""}
+        filterInitialValue={filterInitialState}
       />
       <ConformationAlertDialog
         openAlertDialog={openAlertDialog}

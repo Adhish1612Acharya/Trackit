@@ -1,4 +1,3 @@
-
 export interface ContributersType {
   id: string;
   name: string;
@@ -16,6 +15,7 @@ export interface ProjectsType {
   expenses: string[];
   image: string;
   owner: string;
+  expenseTotal: number;
 }
 
 export interface GetProjectDetailsResponse {

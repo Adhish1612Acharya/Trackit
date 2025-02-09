@@ -5,5 +5,6 @@ import { Action, ThunkDispatch } from "@reduxjs/toolkit";
 export interface filterFormProps {
     dispatch: ThunkDispatch<RootState, undefined, Action>;
     projectOptions: ProjectOptionsType[];
+    filterInitialValue: string[];
   }
   
