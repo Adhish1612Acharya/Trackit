@@ -9,7 +9,7 @@ import {
   orderBy,
   query,
   Timestamp,
-  updateDoc,
+  // updateDoc,
   where,
 } from "firebase/firestore";
 import { setProjectName } from "../../ProjectDetailsSlice";
