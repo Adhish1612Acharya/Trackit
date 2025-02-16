@@ -43,174 +43,165 @@ const editExpenseDetails = createAsyncThunk<
             name: string;
           }[] = [];
 
-          if (
-            editFormValue.projectId !==
-            state.editDeleteExpense.currrentProject.id
-          ) {
-            const docRef = doc(db, "users", user.uid);
-
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-              userProjects = docSnap.data().projects;
-            } else {
-              reject("User Not Found");
-            }
-          }
-
-          const projectDocRef = doc(db, "projects", editFormValue.projectId);
-          const projectDoc = await getDoc(projectDocRef);
-
-          const projectData: ProjectsType = projectDoc.data() as ProjectsType;
-
-          contrubutersLists = projectData ? projectData.contributers : [];
-
-          const contributerExists = checkContributerExists(
-            contrubutersLists,
-            editFormValue.paidToId,
-            editFormValue.miscellaneuosPaidToName,
-            editFormValue.miscellaneousPaidToRole
-          );
-
-          let miscellaneousId = "";
-
-          if (state.editDeleteExpense.miscellaneuosInput) {
-            miscellaneousId = findMiscContributerId(
-              state.editDeleteExpense.allProjectMiscContributer,
-              editFormValue.miscellaneuosPaidToName,
-              editFormValue.miscellaneousPaidToRole
-            );
-          }
-
-          const updatedFormValue: any = {
-            date: new Date(editFormValue.date),
-            amount: editFormValue.amount,
-            paidToId: editFormValue.paidToId,
-            paidToName: findPaidToRoleName(editFormValue.paidToId)[0].name,
-            paymentModeId: editFormValue.paymentModeId,
-            paymentModeName: findPaymentModeName(editFormValue.paymentModeId)[0]
-              .name,
-            projectId: editFormValue.projectId,
-            projectTitle:
-              editFormValue.projectId !==
-              state.editDeleteExpense.currrentProject.id
-                ? findProjectTitle(editFormValue.projectId, userProjects)[0]
-                    .name
-                : state.editDeleteExpense.expenseInfo?.projectTitle,
-            reason: editFormValue.reason,
-            miscellaneous: state.editDeleteExpense.miscellaneuosInput,
-            miscellaneuosPaidToName: state.editDeleteExpense.miscellaneuosInput
-              ? editFormValue.miscellaneuosPaidToName
-              : "",
-            miscellaneousPaidToRole: state.editDeleteExpense.miscellaneuosInput
-              ? editFormValue.miscellaneousPaidToRole
-              : "",
-            miscellaneuosPaidToId: state.editDeleteExpense.miscellaneuosInput
-              ? miscellaneousId
-              : "",
-            billImage: editFormValue.billImage
-              ? (editFormValue.billImage as string)
-              : "",
-            owner: user.uid,
-          };
-
-          const expenseDocRef = doc(
+          //checkOwner
+          const expenseRef = doc(
             db,
             "expense",
             state.editDeleteExpense.expenseId
           );
+          const expenseDocSnap = await getDoc(expenseRef);
 
-          await updateDoc(expenseDocRef, updatedFormValue);
+          const expenseDetails = expenseDocSnap.data();
 
-          updatedFormValue.expenseId = state.editDeleteExpense.expenseId;
-          updatedFormValue.date = String(editFormValue.date);
-
-          const contributerIdOfUneditedExpenseInfo = state.editDeleteExpense
-            .expenseInfo.miscellaneous
-            ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
-            : state.editDeleteExpense.expenseInfo.paidToId;
-
-          if (contributerExists.length == 0) {
-            if (state.editDeleteExpense.miscellaneuosInput) {
-              contributerData = {
-                id: editFormValue.paidToId,
-                name: editFormValue.miscellaneuosPaidToName as string,
-                miscellaneous: true,
-                miscellaneousRole:
-                  editFormValue.miscellaneousPaidToRole as string,
-                miscellaneousId: miscellaneousId,
-              };
-            } else {
-              contributerData = {
-                id: editFormValue.paidToId,
-                name: findPaidToRoleName(editFormValue.paidToId)[0].name,
-                miscellaneous: false,
-                miscellaneousRole: "",
-                miscellaneousId: "",
-              };
-            }
+          if (!expenseDocSnap.exists()) {
+            reject("Expense Not found");
           }
 
-          const prevExpense = state.editDeleteExpense.expenseInfo.amount;
-          const currExpense = editFormValue.amount;
-          const updatedExpenseTotalDiff = Math.abs(prevExpense - currExpense);
-
-          if (
-            editFormValue.projectId !==
-            state.editDeleteExpense.currrentProject.id
-          ) {
-            const batch = writeBatch(db);
-
-            // Reference to the first document
-            const expenseDocRef1 = doc(
-              db,
-              "projects",
+          if (expenseDetails?.owner === user.uid) {
+            if (
+              editFormValue.projectId !==
               state.editDeleteExpense.currrentProject.id
-            );
+            ) {
+              const docRef = doc(db, "users", user.uid);
 
-            // Update data for the first document
-            batch.update(expenseDocRef1, {
-              expenses: arrayRemove(state.editDeleteExpense.expenseId),
-            });
+              const docSnap = await getDoc(docRef);
 
-            // Reference to the second document
-            const expenseDocRef2 = doc(db, "projects", editFormValue.projectId);
-
-            // Update data for the second document
-            if (contributerExists.length === 0) {
-              batch.update(expenseDocRef2, {
-                expenses: arrayUnion(state.editDeleteExpense.expenseId),
-                contributers: arrayUnion(contributerData),
-                expenseTotal:
-                  currExpense > prevExpense
-                    ? increment(updatedExpenseTotalDiff)
-                    : increment(-updatedExpenseTotalDiff),
-              });
-            } else {
-              batch.update(expenseDocRef2, {
-                expenses: arrayUnion(state.editDeleteExpense.expenseId),
-                expenseTotal:
-                  currExpense > prevExpense
-                    ? increment(updatedExpenseTotalDiff)
-                    : increment(-updatedExpenseTotalDiff),
-              });
+              if (docSnap.exists()) {
+                userProjects = docSnap.data().projects;
+              } else {
+                reject("User Not Found");
+              }
             }
 
-            // Commit the batch
-            await batch.commit();
-          } else {
-            if (contributerExists.length === 0) {
-              const projectDocRef = doc(
+            const projectDocRef = doc(db, "projects", editFormValue.projectId);
+            const projectDoc = await getDoc(projectDocRef);
+
+            const projectData: ProjectsType = projectDoc.data() as ProjectsType;
+
+            contrubutersLists = projectData ? projectData.contributers : [];
+
+            const contributerExists = checkContributerExists(
+              contrubutersLists,
+              editFormValue.paidToId,
+              editFormValue.miscellaneuosPaidToName,
+              editFormValue.miscellaneousPaidToRole
+            );
+
+            let miscellaneousId = "";
+
+            if (state.editDeleteExpense.miscellaneuosInput) {
+              miscellaneousId = findMiscContributerId(
+                state.editDeleteExpense.allProjectMiscContributer,
+                editFormValue.miscellaneuosPaidToName,
+                editFormValue.miscellaneousPaidToRole
+              );
+            }
+
+            const updatedFormValue: any = {
+              date: new Date(editFormValue.date),
+              amount: editFormValue.amount,
+              paidToId: editFormValue.paidToId,
+              paidToName: findPaidToRoleName(editFormValue.paidToId)[0].name,
+              paymentModeId: editFormValue.paymentModeId,
+              paymentModeName: findPaymentModeName(
+                editFormValue.paymentModeId
+              )[0].name,
+              projectId: editFormValue.projectId,
+              projectTitle:
+                editFormValue.projectId !==
+                state.editDeleteExpense.currrentProject.id
+                  ? findProjectTitle(editFormValue.projectId, userProjects)[0]
+                      .name
+                  : state.editDeleteExpense.expenseInfo?.projectTitle,
+              reason: editFormValue.reason,
+              miscellaneous: state.editDeleteExpense.miscellaneuosInput,
+              miscellaneuosPaidToName: state.editDeleteExpense
+                .miscellaneuosInput
+                ? editFormValue.miscellaneuosPaidToName
+                : "",
+              miscellaneousPaidToRole: state.editDeleteExpense
+                .miscellaneuosInput
+                ? editFormValue.miscellaneousPaidToRole
+                : "",
+              miscellaneuosPaidToId: state.editDeleteExpense.miscellaneuosInput
+                ? miscellaneousId
+                : "",
+              billImage: editFormValue.billImage
+                ? (editFormValue.billImage as string)
+                : "",
+              owner: user.uid,
+            };
+
+            const expenseDocRef = doc(
+              db,
+              "expense",
+              state.editDeleteExpense.expenseId
+            );
+
+            await updateDoc(expenseDocRef, updatedFormValue);
+
+            updatedFormValue.expenseId = state.editDeleteExpense.expenseId;
+            updatedFormValue.date = String(editFormValue.date);
+
+            const contributerIdOfUneditedExpenseInfo = state.editDeleteExpense
+              .expenseInfo.miscellaneous
+              ? state.editDeleteExpense.expenseInfo.miscellaneuosPaidToId
+              : state.editDeleteExpense.expenseInfo.paidToId;
+
+            if (contributerExists.length == 0) {
+              if (state.editDeleteExpense.miscellaneuosInput) {
+                contributerData = {
+                  id: editFormValue.paidToId,
+                  name: editFormValue.miscellaneuosPaidToName as string,
+                  miscellaneous: true,
+                  miscellaneousRole:
+                    editFormValue.miscellaneousPaidToRole as string,
+                  miscellaneousId: miscellaneousId,
+                };
+              } else {
+                contributerData = {
+                  id: editFormValue.paidToId,
+                  name: findPaidToRoleName(editFormValue.paidToId)[0].name,
+                  miscellaneous: false,
+                  miscellaneousRole: "",
+                  miscellaneousId: "",
+                };
+              }
+            }
+
+            const prevExpense = state.editDeleteExpense.expenseInfo.amount;
+            const currExpense = editFormValue.amount;
+            const updatedExpenseTotalDiff = Math.abs(prevExpense - currExpense);
+
+            if (
+              editFormValue.projectId !==
+              state.editDeleteExpense.currrentProject.id
+            ) {
+              const batch = writeBatch(db);
+
+              // Reference to the first document
+              const expenseDocRef1 = doc(
+                db,
+                "projects",
+                state.editDeleteExpense.currrentProject.id
+              );
+
+              // Update data for the first document
+              batch.update(expenseDocRef1, {
+                expenses: arrayRemove(state.editDeleteExpense.expenseId),
+              });
+
+              // Reference to the second document
+              const expenseDocRef2 = doc(
                 db,
                 "projects",
                 editFormValue.projectId
               );
 
-              if (
-                state.editDeleteExpense.expenseInfo.amount !==
-                editFormValue.amount
-              ) {
-                await updateDoc(projectDocRef, {
+              // Update data for the second document
+              if (contributerExists.length === 0) {
+                batch.update(expenseDocRef2, {
+                  expenses: arrayUnion(state.editDeleteExpense.expenseId),
                   contributers: arrayUnion(contributerData),
                   expenseTotal:
                     currExpense > prevExpense
@@ -218,35 +209,70 @@ const editExpenseDetails = createAsyncThunk<
                       : increment(-updatedExpenseTotalDiff),
                 });
               } else {
-                await updateDoc(projectDocRef, {
-                  contributers: arrayUnion(contributerData),
-                });
-              }
-            } else {
-              if (
-                state.editDeleteExpense.expenseInfo.amount !==
-                editFormValue.amount
-              ) {
-                await updateDoc(projectDocRef, {
+                batch.update(expenseDocRef2, {
+                  expenses: arrayUnion(state.editDeleteExpense.expenseId),
                   expenseTotal:
                     currExpense > prevExpense
                       ? increment(updatedExpenseTotalDiff)
                       : increment(-updatedExpenseTotalDiff),
                 });
               }
+
+              // Commit the batch
+              await batch.commit();
+            } else {
+              if (contributerExists.length === 0) {
+                const projectDocRef = doc(
+                  db,
+                  "projects",
+                  editFormValue.projectId
+                );
+
+                if (
+                  state.editDeleteExpense.expenseInfo.amount !==
+                  editFormValue.amount
+                ) {
+                  await updateDoc(projectDocRef, {
+                    contributers: arrayUnion(contributerData),
+                    expenseTotal:
+                      currExpense > prevExpense
+                        ? increment(updatedExpenseTotalDiff)
+                        : increment(-updatedExpenseTotalDiff),
+                  });
+                } else {
+                  await updateDoc(projectDocRef, {
+                    contributers: arrayUnion(contributerData),
+                  });
+                }
+              } else {
+                if (
+                  state.editDeleteExpense.expenseInfo.amount !==
+                  editFormValue.amount
+                ) {
+                  await updateDoc(projectDocRef, {
+                    expenseTotal:
+                      currExpense > prevExpense
+                        ? increment(updatedExpenseTotalDiff)
+                        : increment(-updatedExpenseTotalDiff),
+                  });
+                }
+              }
             }
+
+            await checkAndRemoveContributer(
+              user.uid,
+              state.editDeleteExpense.currrentProject.id,
+              contributerIdOfUneditedExpenseInfo,
+              state.editDeleteExpense.expenseInfo.miscellaneous
+            );
+
+            resolve({
+              editedExpense: updatedFormValue,
+            });
+          } else {
+            window.location.href = "/u/home";
+            reject("Access denied");
           }
-
-          await checkAndRemoveContributer(
-            user.uid,
-            state.editDeleteExpense.currrentProject.id,
-            contributerIdOfUneditedExpenseInfo,
-            state.editDeleteExpense.expenseInfo.miscellaneous
-          );
-
-          resolve({
-            editedExpense: updatedFormValue,
-          });
         } catch (err) {
           console.log(err);
           reject("Failed to edit expense details. Please try again.");

@@ -2,9 +2,19 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { DeleteProjectResponse } from "./deleteProjectTypes";
 import { auth, db } from "@/firebaseconfig";
 import { RootState } from "@/store/store";
-import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where, writeBatch } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+  writeBatch,
+} from "firebase/firestore";
 
- const deleteProject = createAsyncThunk<
+const deleteProject = createAsyncThunk<
   DeleteProjectResponse,
   void,
   { rejectValue: string }
@@ -17,46 +27,58 @@ import { collection, deleteDoc, doc, getDoc, getDocs, query, updateDoc, where, w
         const expensesRef = collection(db, "expense");
         const q = query(expensesRef, where("projectId", "==", projectId));
 
-        if (projectId) {
-          const querySnapshot = await getDocs(q);
+        const projectSnapShot = await getDoc(
+          doc(db, "projects", projectId || "")
+        );
 
-          // Use a batch to delete all matching documents
-          const batch = writeBatch(db);
+        const projectDetails = projectSnapShot.data();
 
-          querySnapshot.forEach((doc) => {
-            batch.delete(doc.ref);
-          });
+        if (projectDetails?.owner === user.uid) {
+          if (projectId) {
+            const querySnapshot = await getDocs(q);
 
-          // Commit the batch
-          await batch.commit();
+            // Use a batch to delete all matching documents
+            const batch = writeBatch(db);
 
-          const userRef = doc(db, "users", user.uid);
+            querySnapshot.forEach((doc) => {
+              batch.delete(doc.ref);
+            });
 
-          const userSnapShot = await getDoc(userRef);
+            // Commit the batch
+            await batch.commit();
 
-          if (userSnapShot.exists()) {
-            const userData = userSnapShot.data();
-            const updatedUserProjects:{ id: string; name: string }[] = userData.projects.filter(
-              (eachProject: { id: string; name: string }) =>
-                eachProject.id !== projectId
-            );
+            const userRef = doc(db, "users", user.uid);
 
-            await updateDoc(userRef, {
-              projects: updatedUserProjects,
+            const userSnapShot = await getDoc(userRef);
+
+            if (userSnapShot.exists()) {
+              const userData = userSnapShot.data();
+              const updatedUserProjects: { id: string; name: string }[] =
+                userData.projects.filter(
+                  (eachProject: { id: string; name: string }) =>
+                    eachProject.id !== projectId
+                );
+
+              await updateDoc(userRef, {
+                projects: updatedUserProjects,
+              });
+            } else {
+              reject(new Error("User not found"));
+            }
+
+            const projectRef = doc(db, "projects", projectId);
+
+            await deleteDoc(projectRef);
+
+            resolve({
+              projectId,
             });
           } else {
-            reject(new Error("User not found"));
+            reject(new Error("Project id not found"));
           }
-
-          const projectRef = doc(db, "projects", projectId);
-
-          await deleteDoc(projectRef);
-
-          resolve({
-            projectId,
-          });
         } else {
-          reject(new Error("Project id not found"));
+          window.location.href = "/u/home";
+          reject("Access denied");
         }
       } else {
         reject(new Error("User not authenticated"));

@@ -14,7 +14,6 @@ import {
 } from "firebase/firestore";
 import { setProjectName } from "../../ProjectDetailsSlice";
 import formatDate from "@/store/sharedUtils/formatDate";
-// import getUserAllMiscContributers from "@/store/sharedUtils/getUserAllMiscContributers";
 
 const getUserProjectExpense = createAsyncThunk<
   GetUserDailyExpenseResponse,
@@ -27,71 +26,76 @@ const getUserProjectExpense = createAsyncThunk<
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         try {
-          // const userAllMiscContributers = await getUserAllMiscContributers(
-          //   user.uid
-          // );
-          // Query for daily expenses
           const userExpenseQuery = query(
             collection(db, "expense"),
             where("owner", "==", user.uid),
             where("projectId", "==", projectId),
             orderBy("date", "desc")
           );
-          const querySnapShot = await getDocs(userExpenseQuery);
 
-          const dailyExpense = querySnapShot.docs.map((doc) => {
-            const eachDoc = doc.data() as any;
+          const projectSnapShot = await getDoc(doc(db,"projects", projectId));
 
-            const formattedDate = formatDate(
-              eachDoc.date instanceof Timestamp
-                ? eachDoc.date.toDate()
-                : (eachDoc.date as Date)
-            );
+          const projectDetails = projectSnapShot.data();
 
-            eachDoc.date = formattedDate;
-            eachDoc.expenseId = doc.id;
+          if (projectDetails?.owner === user.uid) {
+            const querySnapShot = await getDocs(userExpenseQuery);
 
-            if (!eachDoc.billImage) eachDoc.billImage === "";
+            const dailyExpense = querySnapShot.docs.map((doc) => {
+              const eachDoc = doc.data() as any;
 
-            return eachDoc;
-          });
+              const formattedDate = formatDate(
+                eachDoc.date instanceof Timestamp
+                  ? eachDoc.date.toDate()
+                  : (eachDoc.date as Date)
+              );
 
-          let total = 0;
+              eachDoc.date = formattedDate;
+              eachDoc.expenseId = doc.id;
 
-          if (dailyExpense.length > 0) {
-            total = dailyExpense.reduce(
-              (accu, eachExpense) => accu + Number(eachExpense.amount),
-              0
-            );
-          }
+              if (!eachDoc.billImage) eachDoc.billImage === "";
 
-          // Get user document
-          const userDocRef = doc(db, "users", user.uid);
-          const userDocSnap = await getDoc(userDocRef);
-
-          const projectQuery = doc(db, "projects", projectId);
-          const queryResp = await getDoc(projectQuery);
-
-          const projectDetail = queryResp.data();
-
-          const updatedProjectDetail: any = queryResp.data();
-          updatedProjectDetail.expenseTotal = total;
-
-          // !updatedProjectDetail.expenseTotal &&   await updateDoc(doc(db, "projects", projectId), updatedProjectDetail);
-
-        
-
-          thunkAPI.dispatch(setProjectName(projectDetail?.title));
-
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-
-            resolve({
-              userData,
-              dailyExpense: dailyExpense,
-              total,
-              // userAllMiscContributers
+              return eachDoc;
             });
+
+            let total = 0;
+
+            if (dailyExpense.length > 0) {
+              total = dailyExpense.reduce(
+                (accu, eachExpense) => accu + Number(eachExpense.amount),
+                0
+              );
+            }
+
+            // Get user document
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            const projectQuery = doc(db, "projects", projectId);
+            const queryResp = await getDoc(projectQuery);
+
+            const projectDetail = queryResp.data();
+
+            const updatedProjectDetail: any = queryResp.data();
+            updatedProjectDetail.expenseTotal = total;
+
+            // !updatedProjectDetail.expenseTotal &&   await updateDoc(doc(db, "projects", projectId), updatedProjectDetail);
+
+            thunkAPI.dispatch(setProjectName(projectDetail?.title));
+
+            if (userDocSnap.exists()) {
+              const userData = userDocSnap.data();
+
+              resolve({
+                userData,
+                dailyExpense: dailyExpense,
+                total,
+                // userAllMiscContributers
+              });
+            }
+          }
+           else {
+            window.location.href = "/u/home";
+            reject("Access denied");
           }
         } catch (error) {
           console.error("Error fetching user data:", error);

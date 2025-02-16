@@ -26,30 +26,35 @@ const getExpenseDetails = createAsyncThunk<
           }
 
           const expenseDetails = document.data() as ExpenseType;
-          expenseDetails.expenseId = document.id;
 
-          const userDocRef = doc(db, "users", user.uid);
+          if (expenseDetails.owner === user.uid) {
+            expenseDetails.expenseId = document.id;
 
-          const userDocSnap = await getDoc(userDocRef);
+            const userDocRef = doc(db, "users", user.uid);
 
-          const formattedDate = formatDate(
-            expenseDetails.date instanceof Timestamp
-              ? expenseDetails.date.toDate()
-              : (expenseDetails.date as Date)
-          );
+            const userDocSnap = await getDoc(userDocRef);
 
-          expenseDetails.date = formattedDate;
+            const formattedDate = formatDate(
+              expenseDetails.date instanceof Timestamp
+                ? expenseDetails.date.toDate()
+                : (expenseDetails.date as Date)
+            );
 
-          if (!userDocSnap.exists()) {
-            return reject("User not found");
+            expenseDetails.date = formattedDate;
+
+            if (!userDocSnap.exists()) {
+              return reject("User not found");
+            }
+            const userDetails = userDocSnap.data();
+
+            resolve({
+              expenseDetails: expenseDetails,
+              projectOptions: userDetails.projects,
+              userAllProjectMiscContributers: filteredDuplicateMiscbutersContri,
+            });
+          } else {
+           window.location.href="/u/home"
           }
-          const userDetails = userDocSnap.data();
-
-          resolve({
-            expenseDetails: expenseDetails,
-            projectOptions: userDetails.projects,
-            userAllProjectMiscContributers: filteredDuplicateMiscbutersContri,
-          });
         } catch (err) {
           console.log(err);
           reject("Failed to fetch expense details. Please try again.");

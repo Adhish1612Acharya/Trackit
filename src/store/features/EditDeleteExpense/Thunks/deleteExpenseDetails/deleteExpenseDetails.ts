@@ -29,31 +29,40 @@ export const deleteExpenseDetails = createAsyncThunk<
 
           const expenseDetails = expenseDocSnap.data();
 
-          // Delete the expense document
-          await deleteDoc(expenseDocRef);
+          if (expenseDetails?.owner === user.uid) {
+            // Delete the expense document
+            await deleteDoc(expenseDocRef);
 
-          // Update the user document
-          const projectDocRef = doc(db, "projects", expenseDetails?.projectId);
+            // Update the user document
+            const projectDocRef = doc(
+              db,
+              "projects",
+              expenseDetails?.projectId
+            );
 
-          await updateDoc(projectDocRef, {
-            expenses: arrayRemove(expenseId),
-            expenseTotal: increment(-(expenseDetails as any).amount),
-          });
+            await updateDoc(projectDocRef, {
+              expenses: arrayRemove(expenseId),
+              expenseTotal: increment(-(expenseDetails as any).amount),
+            });
 
-          const contributerId = expenseDetails?.miscellaneous
-            ? expenseDetails?.miscellaneuosPaidToId
-            : expenseDetails?.paidToId;
+            const contributerId = expenseDetails?.miscellaneous
+              ? expenseDetails?.miscellaneuosPaidToId
+              : expenseDetails?.paidToId;
 
-          await checkAndRemoveContributer(
-            user.uid,
-            expenseDetails?.projectId,
-            contributerId,
-            expenseDetails?.miscellaneous
-          );
+            await checkAndRemoveContributer(
+              user.uid,
+              expenseDetails?.projectId,
+              contributerId,
+              expenseDetails?.miscellaneous
+            );
 
-          resolve({
-            deleteExpenseId: expenseDetails?.projectId,
-          });
+            resolve({
+              deleteExpenseId: expenseDetails?.projectId,
+            });
+          } else {
+            window.location.href = "/u/home";
+            reject("Access denied");
+          }
         } catch (err) {
           console.log(err);
           reject(`Error occurred: ${err}`);
