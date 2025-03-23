@@ -93,7 +93,7 @@ const TableComponent: FC<TableComponentProps> = ({
                   )}
                 </TableCell>
                 <TableCell sx={{ color: "#059669", fontWeight: "bold" }}>
-                  &#x20B9;{eachExpense.amount}
+                  &#x20B9;{new Intl.NumberFormat("en-IN").format(eachExpense.amount)}
                 </TableCell>
                 <TableCell>
                   {eachExpense.miscellaneous ? (

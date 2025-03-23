@@ -45,14 +45,14 @@ const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
             <span className="font-medium">Budget</span>
             <span className="text-primary">
               {" "}
-              ₹{new Intl.NumberFormat("en-IN").format(budget)}
+              &#x20B9;{new Intl.NumberFormat("en-IN").format(budget)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="font-medium">Spent</span>
             <span className="text-primary">
               {" "}
-              ₹
+              &#x20B9;
               {expenseTotal > 0
                 ? new Intl.NumberFormat("en-IN").format(expenseTotal)
                 : 0}
