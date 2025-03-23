@@ -50,6 +50,7 @@ const constructionRoles = [
   { id: 49, name: "Survey Technician" },
   { id: 50, name: "Solar Panel Installer" },
   {id:52,name:"Bank Loan"},
+  {id:53,name:"Loan dispersement"},
   { id: 51, name: "Miscellaneous" },
 ];
 
@@ -105,6 +106,7 @@ export const constructionRolesFilterSearch = [
   { id: 49, name: "Survey Technician" },
   { id: 50, name: "Solar Panel Installer" },
    {id:52,name:"Bank Loan"},
+   {id:53,name:"Loan dispersement"},
   { id: 51, name: "Miscellaneous" },
   // { id: -1, name: "" },
 ];
