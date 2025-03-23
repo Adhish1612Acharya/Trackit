@@ -37,6 +37,7 @@ const getUserProjectExpense = createAsyncThunk<
 
           const projectDetails = projectSnapShot.data();
 
+
           if (projectDetails?.owner === user.uid) {
             const querySnapShot = await getDocs(userExpenseQuery);
 

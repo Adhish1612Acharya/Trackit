@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { HomeIcon, Eye,  Trash2 } from "lucide-react";
+import { HomeIcon, Eye, Trash2 } from "lucide-react";
 import {
   setDeleteProjectId,
   setProjectDeleteAlertOpen,
@@ -43,24 +43,31 @@ const ProjectInfoCard: React.FC<ProjectInfoProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="font-medium">Budget</span>
-            <span className="text-primary">{budget}</span>
+            <span className="text-primary">
+              {" "}
+              ₹{new Intl.NumberFormat("en-IN").format(budget)}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="font-medium">Spent</span>
-            <span className="text-primary">{expenseTotal}</span>
+            <span className="text-primary">
+              {" "}
+              ₹
+              {expenseTotal > 0
+                ? new Intl.NumberFormat("en-IN").format(expenseTotal)
+                : 0}
+            </span>
           </div>
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Progress</span>
-            <span className="font-medium">{spentPercentage.toFixed(2)}%</span>
+            <span className="font-medium">
+              {spentPercentage > 0 ? spentPercentage.toFixed(2) : 0}%
+            </span>
           </div>
-          <Progress
-            value={spentPercentage}
-            data-high={spentPercentage > 90}
-
-          />
+          <Progress value={spentPercentage} data-high={spentPercentage > 90} />
         </div>
 
         <div className="flex gap-2 pt-2">
